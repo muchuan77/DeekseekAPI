@@ -54,9 +54,7 @@ export function analyzeText(data) {
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
     },
-    data: {
-      content: data
-    }
+    data: data
   }).catch(error => handleApiError(error, '文本分析'))
 }
 

@@ -84,8 +84,8 @@ logging:
   file:
     name: logs/application.log
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # 保持格式
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"   # 保持格式
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # 淇濇寔鏍煎紡
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"   # 淇濇寔鏍煎紡
 
 ai:
   service:
@@ -105,7 +105,7 @@ jwt:
   secret: ${JWT_SECRET:J8#kL9$mN2@pQ5*rT7&vX3!wY4^zB6}
   expiration: ${JWT_EXPIRATION:86400}
 
-# OpenAPI 配置
+# OpenAPI 閰嶇疆
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

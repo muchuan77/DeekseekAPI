@@ -125,8 +125,8 @@
         <div class="result-item">
           <h3>可信度评分</h3>
           <el-progress
-            :percentage="(analysisResult?.credibilityScore || 0) * 100"
-            :format="(percentage) => percentage ? `${percentage.toFixed(1)}%` : '0%'"
+            :percentage="Math.round((analysisResult?.credibilityScore || 0) * 100)"
+            :format="(percentage) => percentage ? `${percentage}%` : '0%'"
             :status="getCredibilityStatus(analysisResult?.credibilityScore)"
           />
           <div class="score-description">
@@ -191,8 +191,8 @@
             <div class="source-reliability">
               <span class="label">可靠性评分:</span>
               <el-progress
-                :percentage="(analysisResult?.sourceAnalysis?.reliability || 0) * 100"
-                :format="(percentage) => percentage ? `${percentage.toFixed(1)}%` : '0%'"
+                :percentage="Math.round((analysisResult?.sourceAnalysis?.reliability || 0) * 100)"
+                :format="(percentage) => percentage ? `${percentage}%` : '0%'"
                 :status="getReliabilityStatus(analysisResult?.sourceAnalysis?.reliability)"
               />
             </div>
@@ -301,10 +301,11 @@ const getCredibilityStatus = (score) => {
 
 // 获取可信度描述
 const getCredibilityDescription = (score) => {
-  if (!score) return '暂无评分'
+  if (score === null || score === undefined) return '暂无评分'
   if (score >= 0.7) return '该信息可信度较高'
   if (score >= 0.4) return '该信息可信度一般，建议进一步核实'
-  return '该信息可信度较低，存在虚假信息风险'
+  if (score > 0) return '该信息可信度较低，存在虚假信息风险'
+  return '该信息完全不可信，存在严重虚假信息风险'
 }
 
 // 获取可靠性状态
@@ -319,7 +320,7 @@ const getReliabilityStatus = (score) => {
 const getReputationType = (reputation) => {
   if (!reputation || reputation === '未知') return 'info'
   if (reputation.includes('官方') || reputation.includes('权威')) return 'success'
-  if (reputation.includes('未经') || reputation.includes('传闻')) return 'warning'
+  if (reputation.includes('不可靠') || reputation.includes('传闻')) return 'warning'
   return 'info'
 }
 
@@ -394,15 +395,15 @@ const analyzeTextContent = async () => {
   startProgressSimulation()
   
   try {
-    const result = await analyzeText(textContent.value)
+    const result = await analyzeText({
+      content: textContent.value,
+      type: 'TEXT',
+      source: 'user_input',
+      title: '文本分析'
+    })
+    
     if (result && result.code === 200) {
-      if (!result.data.sourceAnalysis) {
-        result.data.sourceAnalysis = {
-          reliability: 0.0,
-          reputation: '未知',
-          concerns: []
-        }
-      }
+      // 直接使用返回的数据，因为格式已经匹配
       analysisResult.value = result.data
       ElMessage.success('分析完成')
     } else {
@@ -410,14 +411,7 @@ const analyzeTextContent = async () => {
     }
   } catch (error) {
     console.error('分析失败:', error)
-    
-    // 超时错误特殊处理
-    if (error.code === 'ECONNABORTED') {
-      ElMessage.error('分析请求超时，请稍后再试或缩短分析内容')
-    } else {
-      ElMessage.error(error.response?.data?.message || error.message || '分析失败')
-    }
-    
+    ElMessage.error(error.response?.data?.message || error.message || '分析失败')
   } finally {
     stopProgressSimulation()
     loading.value = false
@@ -436,6 +430,10 @@ const analyzeImageContent = async () => {
   try {
     const formData = new FormData()
     formData.append('file', imageFile.value)
+    formData.append('type', 'IMAGE')
+    formData.append('source', 'user_input')
+    formData.append('title', '图片分析')
+    
     const result = await analyzeImage(formData)
     if (result && result.code === 200) {
       analysisResult.value = result.data
@@ -445,13 +443,7 @@ const analyzeImageContent = async () => {
     }
   } catch (error) {
     console.error('分析失败:', error)
-    
-    if (error.code === 'ECONNABORTED') {
-      ElMessage.error('分析请求超时，请稍后再试或上传较小的图片')
-    } else {
-      ElMessage.error(error.response?.data?.message || error.message || '分析失败')
-    }
-    
+    ElMessage.error(error.response?.data?.message || error.message || '分析失败')
   } finally {
     stopProgressSimulation()
     loading.value = false
@@ -470,6 +462,10 @@ const analyzeVideoContent = async () => {
   try {
     const formData = new FormData()
     formData.append('file', videoFile.value)
+    formData.append('type', 'VIDEO')
+    formData.append('source', 'user_input')
+    formData.append('title', '视频分析')
+    
     const result = await analyzeVideo(formData)
     if (result && result.code === 200) {
       analysisResult.value = result.data
@@ -479,13 +475,7 @@ const analyzeVideoContent = async () => {
     }
   } catch (error) {
     console.error('分析失败:', error)
-    
-    if (error.code === 'ECONNABORTED') {
-      ElMessage.error('分析请求超时，请稍后再试或上传较短的视频')
-    } else {
-      ElMessage.error(error.response?.data?.message || error.message || '分析失败')
-    }
-    
+    ElMessage.error(error.response?.data?.message || error.message || '分析失败')
   } finally {
     stopProgressSimulation()
     loading.value = false
