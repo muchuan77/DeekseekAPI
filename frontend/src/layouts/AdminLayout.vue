@@ -51,6 +51,10 @@
           <el-icon><el-icon-data-analysis /></el-icon>
           <span>数据分析</span>
         </el-menu-item>
+        <el-menu-item v-if="hasRole('ADMIN')" index="/admin/ai-management">
+          <el-icon><el-icon-data-analysis /></el-icon>
+          <span>AI管理</span>
+        </el-menu-item>
         <el-menu-item v-if="hasRole('ADMIN')" index="/admin/settings">
           <el-icon><el-icon-setting /></el-icon>
           <span>系统设置</span>

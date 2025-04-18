@@ -79,12 +79,20 @@ logging:
 
 ai:
   service:
-    url: ${AI_SERVICE_URL:https://api.deepseek.com/v1}
-    api-key: ${AI_SERVICE_API_KEY:sk-c8c70eeb1e2243bf86eaa3e279549074}
-    timeout: ${AI_SERVICE_TIMEOUT:30000}
+    url: https://api.deepseek.com
+    api-key: ${DEEPSEEK_API_KEY:sk-c8c70eeb1e2243bf86eaa3e279549074}
+    timeout: 60000
+    max-retries: 3
+    retry-delay: 1000
+    model: deepseek-chat
+    temperature: 0.7
+    max-tokens: 2000
+    frequency-penalty: 0
+    presence-penalty: 0
+    top-p: 1
 
 jwt:
-  secret: ${JWT_SECRET:your-secret-key}
+  secret: ${JWT_SECRET:J8#kL9$mN2@pQ5*rT7&vX3!wY4^zB6}
   expiration: ${JWT_EXPIRATION:86400}
 
 # OpenAPI 配置

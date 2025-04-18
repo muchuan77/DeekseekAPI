@@ -3,40 +3,46 @@ import request from '@/utils/request'
 // 文本分析
 export function analyzeText(data) {
   return request({
-    url: '/ai/analyze/text',
+    url: '/api/deepseek/analyze/text',
     method: 'post',
-    data
+    data: {
+      content: data
+    }
   })
 }
 
 // 图像分析
 export function analyzeImage(data) {
   return request({
-    url: '/ai/analyze/image',
+    url: '/api/deepseek/analyze/image',
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
     },
-    data
+    data: {
+      content: data
+    }
   })
 }
 
 // 视频分析
 export function analyzeVideo(data) {
   return request({
-    url: '/ai/analyze/video',
+    url: '/api/deepseek/analyze/video',
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
     },
-    data
+    data: {
+      content: data
+    }
   })
 }
 
 // 获取分析结果
 export function getAnalysisResult(analysisId) {
   return request({
-    url: `/ai/results/${analysisId}`,
+    url: `/api/deepseek/results/${analysisId}`,
     method: 'get'
   })
 }
@@ -44,7 +50,7 @@ export function getAnalysisResult(analysisId) {
 // 获取分析历史
 export function getAnalysisHistory(params) {
   return request({
-    url: '/ai/history',
+    url: '/api/deepseek/history',
     method: 'get',
     params
   })
@@ -53,7 +59,7 @@ export function getAnalysisHistory(params) {
 // 获取分析统计
 export function getAnalysisStatistics() {
   return request({
-    url: '/ai/statistics',
+    url: '/api/deepseek/statistics',
     method: 'get'
   })
 }
@@ -61,7 +67,7 @@ export function getAnalysisStatistics() {
 // 获取分析配置
 export function getAnalysisConfig() {
   return request({
-    url: '/ai/config',
+    url: '/api/deepseek/config',
     method: 'get'
   })
 }
@@ -69,7 +75,7 @@ export function getAnalysisConfig() {
 // 更新分析配置
 export function updateAnalysisConfig(data) {
   return request({
-    url: '/ai/config',
+    url: '/api/deepseek/config',
     method: 'put',
     data
   })

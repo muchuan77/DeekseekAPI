@@ -43,6 +43,12 @@ const routes = [
         meta: { title: '谣言详情', requiresAuth: true }
       },
       {
+        path: 'ai',
+        name: 'AI',
+        component: () => import('@/views/AI.vue'),
+        meta: { title: 'AI分析' }
+      },
+      {
         path: 'multimodal',
         name: 'Multimodal',
         component: () => import('@/views/MultimodalAnalysis.vue'),
@@ -59,12 +65,6 @@ const routes = [
         name: 'LogVisualization',
         component: () => import('@/views/LogVisualization.vue'),
         meta: { title: '日志可视化' }
-      },
-      {
-        path: 'detection',
-        name: 'Detection',
-        component: () => import('@/views/Detection.vue'),
-        meta: { title: '谣言检测' }
       },
       {
         path: 'trace',
@@ -143,6 +143,12 @@ const routes = [
         name: 'PermissionManagement',
         component: () => import('@/views/admin/PermissionManagement.vue'),
         meta: { title: '权限管理', roles: ['ADMIN'] }
+      },
+      {
+        path: 'ai-management',
+        name: 'AIManagement',
+        component: () => import('@/views/admin/AIManagement.vue'),
+        meta: { title: 'AI管理', roles: ['ADMIN'] }
       },
       {
         path: 'profile',

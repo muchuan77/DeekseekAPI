@@ -20,20 +20,20 @@ public class DeepSeekAnalysisController {
     
     @PostMapping("/analyze/text")
     @Operation(summary = "分析文本内容")
-    public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeText(@RequestBody String content) {
-        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeText(content)));
+    public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeText(@RequestBody DeepSeekAnalysisRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeText(request.getContent())));
     }
     
     @PostMapping("/analyze/image")
     @Operation(summary = "分析图片内容")
-    public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeImage(@RequestBody String imageUrl) {
-        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeImage(imageUrl)));
+    public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeImage(@RequestBody DeepSeekAnalysisRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeImage(request.getContent())));
     }
     
     @PostMapping("/analyze/video")
     @Operation(summary = "分析视频内容")
-    public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeVideo(@RequestBody String videoUrl) {
-        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeVideo(videoUrl)));
+    public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeVideo(@RequestBody DeepSeekAnalysisRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeVideo(request.getContent())));
     }
     
     @PostMapping("/analyze/multimodal")

@@ -23,17 +23,17 @@
             <el-icon><Document /></el-icon>
             <span>谣言列表</span>
           </el-menu-item>
-          <el-menu-item index="/detection">
-            <el-icon><Search /></el-icon>
-            <span>谣言检测</span>
-          </el-menu-item>
-          <el-menu-item index="/trace"> 
-            <el-icon><Connection /></el-icon>
-            <span>溯源可视化</span> 
+          <el-menu-item index="/ai">
+            <el-icon><Cpu /></el-icon>
+            <span>AI分析</span>
           </el-menu-item>
           <el-menu-item index="/multimodal">
             <el-icon><PictureFilled /></el-icon>
             <span>多模态分析</span>
+          </el-menu-item>
+          <el-menu-item index="/trace"> 
+            <el-icon><Connection /></el-icon>
+            <span>溯源可视化</span> 
           </el-menu-item>
           <el-menu-item index="/sync">
             <el-icon><Refresh /></el-icon>
@@ -99,7 +99,8 @@ import {
   Refresh,
   User,
   Setting,
-  ArrowDown
+  ArrowDown,
+  Cpu
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
