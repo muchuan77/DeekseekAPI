@@ -2,12 +2,22 @@ server:
   port: ${SERVER_PORT:8080}
   servlet:
     context-path: /
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
 
 spring:
   main:
     allow-bean-definition-overriding: true
   application:
     name: rumor-tracing-backend
+
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
   profiles:
     active: local

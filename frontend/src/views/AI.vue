@@ -37,7 +37,9 @@
           :on-change="handleImageChange"
           :show-file-list="false"
         >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <el-icon class="el-icon--upload">
+            <component :is="icons.Upload" />
+          </el-icon>
           <div class="el-upload__text">
             拖拽图片到此处或 <em>点击上传</em>
           </div>
@@ -59,7 +61,9 @@
           :on-change="handleVideoChange"
           :show-file-list="false"
         >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <el-icon class="el-icon--upload">
+            <component :is="icons.Upload" />
+          </el-icon>
           <div class="el-upload__text">
             拖拽视频到此处或 <em>点击上传</em>
           </div>
@@ -72,62 +76,149 @@
       </div>
     </el-card>
 
+    <!-- 分析进度 -->
+    <el-dialog v-model="showProgress" title="分析中..." width="30%" :close-on-click-modal="false" :show-close="false">
+      <div class="progress-dialog">
+        <el-progress
+          :percentage="progressPercentage"
+          :indeterminate="true"
+          :duration="3"
+          :stroke-width="20"
+          status="warning"
+        />
+        <div class="progress-steps">
+          <div v-for="(step, index) in progressSteps" :key="index" 
+               :class="['progress-step', { 'active': currentStep >= index }]">
+            <el-icon v-if="currentStep > index">
+              <component :is="icons.Check" />
+            </el-icon>
+            <el-icon v-else-if="currentStep === index">
+              <component :is="icons.Loading" />
+            </el-icon>
+            <el-icon v-else>
+              <component :is="icons.CircleCheck" />
+            </el-icon>
+            <span>{{ step }}</span>
+          </div>
+        </div>
+        <div class="progress-message">{{ progressMessage }}</div>
+      </div>
+    </el-dialog>
+
     <!-- 分析结果 -->
     <el-card v-if="analysisResult" class="result-card">
       <template #header>
         <div class="card-header">
           <span>分析结果</span>
+          <div class="header-actions">
+            <el-button size="small" @click="exportResult" type="success">
+              <el-icon>
+                <component :is="icons.Download" />
+              </el-icon>
+              导出分析结果
+            </el-button>
+          </div>
         </div>
       </template>
       <div class="result-content">
+        <!-- 可信度评分 -->
         <div class="result-item">
           <h3>可信度评分</h3>
           <el-progress
-            :percentage="analysisResult.credibilityScore * 100"
-            :format="format"
+            :percentage="(analysisResult?.credibilityScore || 0) * 100"
+            :format="(percentage) => percentage ? `${percentage.toFixed(1)}%` : '0%'"
+            :status="getCredibilityStatus(analysisResult?.credibilityScore)"
           />
+          <div class="score-description">
+            {{ getCredibilityDescription(analysisResult?.credibilityScore) }}
+          </div>
         </div>
+
+        <!-- 事实核查要点 -->
         <div class="result-item">
           <h3>事实核查要点</h3>
-          <el-tag
-            v-for="(point, index) in analysisResult.factCheckingPoints"
-            :key="index"
-            class="ml-2"
-            type="success"
-          >
-            {{ point }}
-          </el-tag>
+          <el-timeline v-if="analysisResult?.factCheckingPoints?.length">
+            <el-timeline-item
+              v-for="(point, index) in analysisResult.factCheckingPoints"
+              :key="index"
+              type="success"
+            >
+              {{ point }}
+            </el-timeline-item>
+          </el-timeline>
+          <div v-else class="empty-text">
+            暂无事实核查要点
+          </div>
         </div>
+
+        <!-- 虚假信息指标 -->
         <div class="result-item">
           <h3>虚假信息指标</h3>
-          <el-tag
-            v-for="(indicator, index) in analysisResult.misinformationIndicators"
+          <el-alert
+            v-for="(indicator, index) in analysisResult?.misinformationIndicators"
             :key="index"
-            class="ml-2"
-            type="danger"
-          >
-            {{ indicator }}
-          </el-tag>
+            :title="indicator"
+            type="warning"
+            :closable="false"
+            show-icon
+            class="indicator-item"
+          />
+          <div v-if="!analysisResult?.misinformationIndicators?.length" class="empty-text">
+            暂无虚假信息指标
+          </div>
         </div>
+
+        <!-- 验证建议 -->
         <div class="result-item">
           <h3>验证建议</h3>
-          <p>{{ analysisResult.verificationRecommendation }}</p>
+          <el-card shadow="never" class="verification-card">
+            <template #header>
+              <div class="verification-header">
+                <el-icon>
+                  <component :is="icons.InfoFilled" />
+                </el-icon>
+                <span>建议采取以下步骤进行验证</span>
+              </div>
+            </template>
+            <p>{{ analysisResult?.verificationRecommendation || '暂无验证建议' }}</p>
+          </el-card>
         </div>
+
+        <!-- 来源分析 -->
         <div class="result-item">
           <h3>来源分析</h3>
-          <p>可靠性评分: {{ analysisResult.sourceAnalysis.reliability }}</p>
-          <p>声誉: {{ analysisResult.sourceAnalysis.reputation }}</p>
-          <div>
-            <h4>关注点:</h4>
-            <el-tag
-              v-for="(concern, index) in analysisResult.sourceAnalysis.concerns"
-              :key="index"
-              class="ml-2"
-              type="warning"
-            >
-              {{ concern }}
-            </el-tag>
-          </div>
+          <el-card shadow="hover" class="source-analysis-card">
+            <div class="source-reliability">
+              <span class="label">可靠性评分:</span>
+              <el-progress
+                :percentage="(analysisResult?.sourceAnalysis?.reliability || 0) * 100"
+                :format="(percentage) => percentage ? `${percentage.toFixed(1)}%` : '0%'"
+                :status="getReliabilityStatus(analysisResult?.sourceAnalysis?.reliability)"
+              />
+            </div>
+            <div class="source-reputation">
+              <span class="label">声誉:</span>
+              <el-tag :type="getReputationType(analysisResult?.sourceAnalysis?.reputation)">
+                {{ analysisResult?.sourceAnalysis?.reputation || '未知' }}
+              </el-tag>
+            </div>
+            <div class="source-concerns">
+              <h4>关注点:</h4>
+              <el-collapse v-if="analysisResult?.sourceAnalysis?.concerns?.length">
+                <el-collapse-item title="查看详细关注点">
+                  <el-tag
+                    v-for="(concern, index) in analysisResult.sourceAnalysis.concerns"
+                    :key="index"
+                    class="ml-2"
+                    type="warning"
+                  >
+                    {{ concern }}
+                  </el-tag>
+                </el-collapse-item>
+              </el-collapse>
+              <div v-else class="empty-text">暂无关注点</div>
+            </div>
+          </el-card>
         </div>
       </div>
     </el-card>
@@ -135,10 +226,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, defineComponent, h } from 'vue'
 import { ElMessage } from 'element-plus'
-import { UploadFilled } from '@element-plus/icons-vue'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { analyzeText, analyzeImage, analyzeVideo } from '@/api/ai'
+
+// 定义图标组件映射
+const icons = {}
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  icons[key] = component
+}
 
 const analysisType = ref('text')
 const textContent = ref('')
@@ -147,8 +244,136 @@ const videoFile = ref(null)
 const loading = ref(false)
 const analysisResult = ref(null)
 
-const format = (percentage) => {
-  return percentage.toFixed(2) + '%'
+// 进度对话框相关
+const showProgress = ref(false)
+const progressPercentage = ref(0)
+const progressSteps = [
+  '准备分析内容',
+  '向AI发送请求',
+  '等待AI分析',
+  '处理分析结果'
+]
+const currentStep = ref(0)
+const progressMessage = ref('正在准备分析...')
+
+// 进度条更新函数
+const updateProgress = (step, message) => {
+  currentStep.value = step
+  progressMessage.value = message
+  progressPercentage.value = (step / (progressSteps.length - 1)) * 100
+}
+
+// 模拟进度更新
+const startProgressSimulation = () => {
+  currentStep.value = 0
+  progressPercentage.value = 0
+  showProgress.value = true
+  
+  updateProgress(0, '正在准备分析内容...')
+  
+  // 模拟第二步延迟
+  setTimeout(() => {
+    updateProgress(1, '正在向AI发送请求...')
+    
+    // 模拟第三步延迟
+    setTimeout(() => {
+      updateProgress(2, '正在等待AI分析结果...')
+    }, 2000)
+  }, 1000)
+}
+
+const stopProgressSimulation = () => {
+  updateProgress(3, '正在处理分析结果...')
+  
+  // 显示完成后延迟关闭
+  setTimeout(() => {
+    showProgress.value = false
+  }, 1000)
+}
+
+// 获取可信度状态
+const getCredibilityStatus = (score) => {
+  if (!score) return ''
+  if (score >= 0.7) return 'success'
+  if (score >= 0.4) return 'warning'
+  return 'exception'
+}
+
+// 获取可信度描述
+const getCredibilityDescription = (score) => {
+  if (!score) return '暂无评分'
+  if (score >= 0.7) return '该信息可信度较高'
+  if (score >= 0.4) return '该信息可信度一般，建议进一步核实'
+  return '该信息可信度较低，存在虚假信息风险'
+}
+
+// 获取可靠性状态
+const getReliabilityStatus = (score) => {
+  if (!score) return ''
+  if (score >= 0.7) return 'success'
+  if (score >= 0.4) return 'warning'
+  return 'exception'
+}
+
+// 获取声誉类型
+const getReputationType = (reputation) => {
+  if (!reputation || reputation === '未知') return 'info'
+  if (reputation.includes('官方') || reputation.includes('权威')) return 'success'
+  if (reputation.includes('未经') || reputation.includes('传闻')) return 'warning'
+  return 'info'
+}
+
+// 导出分析结果
+const exportResult = () => {
+  if (!analysisResult.value) {
+    ElMessage.warning('没有可导出的分析结果')
+    return
+  }
+  
+  try {
+    // 创建要导出的内容
+    const content = `
+谣言分析报告
+==============================
+
+分析内容: ${textContent.value.substring(0, 100)}${textContent.value.length > 100 ? '...' : ''}
+
+可信度评分: ${(analysisResult.value.credibilityScore * 100).toFixed(1)}%
+可信度评估: ${getCredibilityDescription(analysisResult.value.credibilityScore)}
+
+事实核查要点:
+${analysisResult.value.factCheckingPoints.map(point => `- ${point}`).join('\n') || '暂无事实核查要点'}
+
+虚假信息指标:
+${analysisResult.value.misinformationIndicators.map(indicator => `- ${indicator}`).join('\n') || '暂无虚假信息指标'}
+
+验证建议:
+${analysisResult.value.verificationRecommendation || '暂无验证建议'}
+
+来源分析:
+- 可靠性评分: ${(analysisResult.value.sourceAnalysis?.reliability * 100).toFixed(1)}%
+- 声誉: ${analysisResult.value.sourceAnalysis?.reputation || '未知'}
+- 关注点:
+${analysisResult.value.sourceAnalysis?.concerns.map(concern => `  * ${concern}`).join('\n') || '  暂无关注点'}
+
+==============================
+分析时间: ${new Date().toLocaleString()}
+`
+    
+    // 创建Blob对象
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+    
+    // 创建临时下载链接并点击
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `谣言分析报告_${new Date().toISOString().slice(0,10)}.txt`
+    link.click()
+    
+    ElMessage.success('分析报告已导出')
+  } catch (error) {
+    console.error('导出失败:', error)
+    ElMessage.error('导出失败')
+  }
 }
 
 const handleImageChange = (file) => {
@@ -164,15 +389,37 @@ const analyzeTextContent = async () => {
     ElMessage.warning('请输入要分析的文本内容')
     return
   }
+  
   loading.value = true
+  startProgressSimulation()
+  
   try {
     const result = await analyzeText(textContent.value)
-    if (result) {
-      analysisResult.value = result
+    if (result && result.code === 200) {
+      if (!result.data.sourceAnalysis) {
+        result.data.sourceAnalysis = {
+          reliability: 0.0,
+          reputation: '未知',
+          concerns: []
+        }
+      }
+      analysisResult.value = result.data
+      ElMessage.success('分析完成')
+    } else {
+      ElMessage.error(result?.message || '分析失败')
     }
   } catch (error) {
-    ElMessage.error('分析失败：' + error.message)
+    console.error('分析失败:', error)
+    
+    // 超时错误特殊处理
+    if (error.code === 'ECONNABORTED') {
+      ElMessage.error('分析请求超时，请稍后再试或缩短分析内容')
+    } else {
+      ElMessage.error(error.response?.data?.message || error.message || '分析失败')
+    }
+    
   } finally {
+    stopProgressSimulation()
     loading.value = false
   }
 }
@@ -182,17 +429,31 @@ const analyzeImageContent = async () => {
     ElMessage.warning('请上传要分析的图片')
     return
   }
+  
   loading.value = true
+  startProgressSimulation()
+  
   try {
     const formData = new FormData()
     formData.append('file', imageFile.value)
     const result = await analyzeImage(formData)
-    if (result) {
-      analysisResult.value = result
+    if (result && result.code === 200) {
+      analysisResult.value = result.data
+      ElMessage.success('分析完成')
+    } else {
+      ElMessage.error(result?.message || '分析失败')
     }
   } catch (error) {
-    ElMessage.error('分析失败：' + error.message)
+    console.error('分析失败:', error)
+    
+    if (error.code === 'ECONNABORTED') {
+      ElMessage.error('分析请求超时，请稍后再试或上传较小的图片')
+    } else {
+      ElMessage.error(error.response?.data?.message || error.message || '分析失败')
+    }
+    
   } finally {
+    stopProgressSimulation()
     loading.value = false
   }
 }
@@ -202,17 +463,31 @@ const analyzeVideoContent = async () => {
     ElMessage.warning('请上传要分析的视频')
     return
   }
+  
   loading.value = true
+  startProgressSimulation()
+  
   try {
     const formData = new FormData()
     formData.append('file', videoFile.value)
     const result = await analyzeVideo(formData)
-    if (result) {
-      analysisResult.value = result
+    if (result && result.code === 200) {
+      analysisResult.value = result.data
+      ElMessage.success('分析完成')
+    } else {
+      ElMessage.error(result?.message || '分析失败')
     }
   } catch (error) {
-    ElMessage.error('分析失败：' + error.message)
+    console.error('分析失败:', error)
+    
+    if (error.code === 'ECONNABORTED') {
+      ElMessage.error('分析请求超时，请稍后再试或上传较短的视频')
+    } else {
+      ElMessage.error(error.response?.data?.message || error.message || '分析失败')
+    }
+    
   } finally {
+    stopProgressSimulation()
     loading.value = false
   }
 }
@@ -234,6 +509,11 @@ const analyzeVideoContent = async () => {
   align-items: center;
 }
 
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .button-group {
   margin-top: 20px;
   text-align: center;
@@ -244,25 +524,133 @@ const analyzeVideoContent = async () => {
 }
 
 .result-item {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
 }
 
 .result-item h3 {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+  color: #303133;
+  font-weight: 600;
 }
 
 .result-item h4 {
-  margin: 10px 0;
+  margin: 12px 0;
+  color: #606266;
+}
+
+.score-description {
+  margin-top: 10px;
+  color: #606266;
+  font-size: 14px;
+}
+
+.indicator-item {
+  margin-bottom: 10px;
+}
+
+.verification-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.source-analysis-card {
+  background: #f8f9fa;
+}
+
+.source-reliability,
+.source-reputation {
+  margin-bottom: 16px;
+}
+
+.label {
+  display: inline-block;
+  width: 100px;
+  color: #606266;
 }
 
 .ml-2 {
-  margin-left: 8px;
-  margin-bottom: 8px;
+  margin: 4px;
 }
 
-.upload-demo {
+.empty-text {
+  color: #909399;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.verification-card {
+  border: 1px solid #e4e7ed;
+}
+
+.source-concerns {
+  margin-top: 16px;
+}
+
+/* 进度对话框样式 */
+.progress-dialog {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-steps {
+  margin-top: 30px;
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #909399;
+  font-size: 12px;
+  width: 25%;
+  text-align: center;
+}
+
+.progress-step.active {
+  color: #409EFF;
+  font-weight: bold;
+}
+
+.progress-step .el-icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.progress-message {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #606266;
+}
+
+:deep(.el-timeline-item__content) {
+  color: #303133;
+}
+
+:deep(.el-collapse-item__header) {
+  font-size: 14px;
+  color: #606266;
+}
+
+:deep(.el-progress-bar__inner) {
+  transition: all 0.3s ease;
+}
+
+:deep(.el-card__header) {
+  padding: 12px 20px;
+  border-bottom: 1px solid #e4e7ed;
 }
 </style> 

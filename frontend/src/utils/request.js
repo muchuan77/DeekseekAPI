@@ -6,9 +6,13 @@ import { useAuthStore } from '@/stores/auth'
 // 创建axios实例
 const service = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
-  timeout: 15000, // 请求超时时间
+  timeout: 300000, // 请求超时时间 5分钟
   retry: 3, // 重试次数
-  retryDelay: 1000 // 重试间隔
+  retryDelay: 1000, // 重试间隔
+  headers: {
+    'Content-Type': 'application/json;charset=UTF-8',
+    'Accept': 'application/json'
+  }
 })
 
 // 请求取消控制器
@@ -17,11 +21,28 @@ const controller = new AbortController()
 // 请求拦截器
 service.interceptors.request.use(
   config => {
+    // 确保请求具有正确的字符编码
+    if (config.method === 'post' || config.method === 'put') {
+      if (!config.headers) {
+        config.headers = {}
+      }
+      
+      if (!config.headers['Content-Type']) {
+        config.headers['Content-Type'] = 'application/json;charset=UTF-8'
+      }
+      
+      // 如果是form-data，不设置application/json
+      if (config.data instanceof FormData) {
+        delete config.headers['Content-Type']
+      }
+    }
+    
     // 从localStorage获取token
     const token = localStorage.getItem('token')
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
     }
+    
     return config
   },
   error => {

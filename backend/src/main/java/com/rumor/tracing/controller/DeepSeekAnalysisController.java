@@ -8,7 +8,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/deepseek")
@@ -18,34 +21,42 @@ public class DeepSeekAnalysisController {
     
     private final DeepSeekAIService deepSeekAIService;
     
-    @PostMapping("/analyze/text")
+    @PostMapping(value = "/analyze/text", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "分析文本内容")
     public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeText(@RequestBody DeepSeekAnalysisRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeText(request.getContent())));
+        return ResponseEntity.ok()
+            .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+            .body(ApiResponse.success(deepSeekAIService.analyzeText(request.getContent())));
     }
     
-    @PostMapping("/analyze/image")
+    @PostMapping(value = "/analyze/image", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "分析图片内容")
     public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeImage(@RequestBody DeepSeekAnalysisRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeImage(request.getContent())));
+        return ResponseEntity.ok()
+            .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+            .body(ApiResponse.success(deepSeekAIService.analyzeImage(request.getContent())));
     }
     
-    @PostMapping("/analyze/video")
+    @PostMapping(value = "/analyze/video", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "分析视频内容")
     public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeVideo(@RequestBody DeepSeekAnalysisRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(deepSeekAIService.analyzeVideo(request.getContent())));
+        return ResponseEntity.ok()
+            .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+            .body(ApiResponse.success(deepSeekAIService.analyzeVideo(request.getContent())));
     }
     
-    @PostMapping("/analyze/multimodal")
+    @PostMapping(value = "/analyze/multimodal", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "多模态分析")
     public ResponseEntity<ApiResponse<RumorAnalysis>> analyzeMultiModal(
             @RequestBody DeepSeekAnalysisRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(
-            deepSeekAIService.analyzeMultiModal(
-                request.getContent(),
-                request.getImageUrl(),
-                request.getVideoUrl()
-            )
-        ));
+        return ResponseEntity.ok()
+            .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+            .body(ApiResponse.success(
+                deepSeekAIService.analyzeMultiModal(
+                    request.getContent(),
+                    request.getImageUrl(),
+                    request.getVideoUrl()
+                )
+            ));
     }
 } 
