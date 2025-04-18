@@ -1,0 +1,110 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: rumor-tracing-backend
+
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:rumor_tracing}?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&logger=Slf4JLogger&profileSQL=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:Yxh258012}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 30000
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          time_zone: UTC
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 0
+    timeout: 10000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1
+
+  elasticsearch:
+    rest:
+      uris: http://${ELASTICSEARCH_HOST:localhost}:${ELASTICSEARCH_PORT:9200}
+      username: ${ELASTICSEARCH_USERNAME:ecat}
+      password: ${ELASTICSEARCH_PASSWORD:yxh258012}
+    connection-timeout: 5000
+    socket-timeout: 5000
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+logging:
+  level:
+    root: INFO
+    com.rumor.tracing: DEBUG
+    org.springframework.web: DEBUG
+    org.springdoc: DEBUG
+    org.springframework.security: INFO
+    org.hibernate: DEBUG
+    com.zaxxer.hikari: DEBUG
+    org.springframework.jdbc: DEBUG
+  file:
+    name: logs/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # 保持格式
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"   # 保持格式
+
+ai:
+  service:
+    url: ${AI_SERVICE_URL:http://localhost:8081}
+    api-key: ${AI_SERVICE_API_KEY:your-api-key}
+    timeout: ${AI_SERVICE_TIMEOUT:30000}
+
+jwt:
+  secret: ${JWT_SECRET:your-secret-key}
+  expiration: ${JWT_EXPIRATION:86400}
+
+# OpenAPI 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  api-docs:
+    path: /v3/api-docs
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  packages-to-scan: com.rumor.tracing.controller
+  paths-to-match: /api/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+

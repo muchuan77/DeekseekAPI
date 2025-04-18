@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  backend.url: "http://backend:8080"
+  ai-model.url: "http://ai-model:5000"
+  blockchain.url: "http://blockchain:7051"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  password: cGFzc3dvcmQ=  # base64编码的"password"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: blockchain-secret
+type: Opaque
+data:
+  admin-key: YWRtaW4=  # base64编码的"admin"
+  admin-cert: Y2VydA==  # base64编码的"cert" 

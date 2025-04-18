@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+    networks:
+      - rumor-network
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VUE_APP_API_URL=http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - rumor-network
+
+  # AI服务
+  ai-service:
+    build:
+      context: ./ai-model
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./ai-model:/app
+    networks:
+      - rumor-network
+
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rumor-network
+
+  # Redis服务
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    networks:
+      - rumor-network
+
+  # Elasticsearch服务
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_USERNAME=${ELASTICSEARCH_USERNAME}
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - rumor-network
+
+volumes:
+  mysql_data:
+  elasticsearch_data:
+
+networks:
+  rumor-network:
+    driver: bridge 

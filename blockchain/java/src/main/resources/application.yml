@@ -1,0 +1,15 @@
+blockchain:
+  network-config-path: ${BLOCKCHAIN_NETWORK_CONFIG_PATH:connection.json}
+  wallet-path: ${BLOCKCHAIN_WALLET_PATH:wallet}
+  user-name: ${BLOCKCHAIN_USER_NAME:admin}
+  channel-name: ${BLOCKCHAIN_CHANNEL_NAME:mychannel}
+  contract-name: ${BLOCKCHAIN_CONTRACT_NAME:rumorcc}
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+logging:
+  level:
+    com.rumor.tracing: DEBUG
+    org.hyperledger.fabric: INFO

@@ -1,0 +1,51 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+target/
+build/
+out/
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+.factorypath
+.springBeans
+
+# Vue.js
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.env.local
+.env.*.local
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Database
+*.db
+*.sqlite
+*.h2.db
+
+# Logs
+logs/
+*.log
+
+# System Files
+.DS_Store
+Thumbs.db 

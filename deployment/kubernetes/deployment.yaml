@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: rumor-tracing-backend:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://mysql:3306/rumor_tracing"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "root"
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: rumor-tracing-frontend:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-model
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-model
+  template:
+    metadata:
+      labels:
+        app: ai-model
+    spec:
+      containers:
+      - name: ai-model
+        image: rumor-tracing-ai-model:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: model-storage
+          mountPath: /app/models
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: ai-model-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blockchain
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blockchain
+  template:
+    metadata:
+      labels:
+        app: blockchain
+    spec:
+      containers:
+      - name: blockchain
+        image: rumor-tracing-blockchain:latest
+        ports:
+        - containerPort: 7051
+        - containerPort: 7052
+        volumeMounts:
+        - name: blockchain-data
+          mountPath: /var/hyperledger/production
+      volumes:
+      - name: blockchain-data
+        persistentVolumeClaim:
+          claimName: blockchain-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-model
+spec:
+  selector:
+    app: ai-model
+  ports:
+  - port: 5000
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockchain
+spec:
+  selector:
+    app: blockchain
+  ports:
+  - port: 7051
+    targetPort: 7051
+  - port: 7052
+    targetPort: 7052
+  type: ClusterIP 

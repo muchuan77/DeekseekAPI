@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush        1
+        Log_Level    info
+        Daemon       off
+        Parsers_File parsers.conf
+        HTTP_Server  On
+        HTTP_Listen  0.0.0.0
+        HTTP_Port    2020
+
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Parser            docker
+        Tag               kube.*
+        Refresh_Interval  5
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+
+    [OUTPUT]
+        Name            es
+        Match           *
+        Host            elasticsearch
+        Port            9200
+        Logstash_Format On
+        Retry_Limit     False
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluent-bit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: fluent-bit
+    spec:
+      containers:
+      - name: fluent-bit
+        image: fluent/fluent-bit:1.8.11
+        ports:
+        - containerPort: 2020
+        volumeMounts:
+        - name: config
+          mountPath: /fluent-bit/etc/fluent-bit.conf
+          subPath: fluent-bit.conf
+        - name: varlog
+          mountPath: /var/log
+      volumes:
+      - name: config
+        configMap:
+          name: fluent-bit-config
+      - name: varlog
+        hostPath:
+          path: /var/log
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit
+spec:
+  selector:
+    app: fluent-bit
+  ports:
+  - port: 2020
+    targetPort: 2020
+  type: ClusterIP 

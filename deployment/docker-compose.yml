@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/rumor_tracing
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - rumor-network
+
+  # 前端服务
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - rumor-network
+
+  # 数据库服务
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=rumor_tracing
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - rumor-network
+
+  # Redis缓存
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - rumor-network
+
+  # AI模型服务
+  ai-model:
+    build:
+      context: ../ai-model
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - MODEL_PATH=/app/models
+    volumes:
+      - ai-model-data:/app/models
+    networks:
+      - rumor-network
+
+  # 区块链节点
+  blockchain:
+    build:
+      context: ../blockchain
+      dockerfile: Dockerfile
+    ports:
+      - "7051:7051"
+      - "7052:7052"
+    volumes:
+      - blockchain-data:/var/hyperledger/production
+    networks:
+      - rumor-network
+
+volumes:
+  mysql-data:
+  redis-data:
+  ai-model-data:
+  blockchain-data:
+
+networks:
+  rumor-network:
+    driver: bridge 
