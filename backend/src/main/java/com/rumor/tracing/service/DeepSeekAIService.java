@@ -1,10 +1,10 @@
-package com.rumor.tracing.ai.service;
+package com.rumor.tracing.service;
 
 import com.rumor.tracing.entity.RumorAnalysis;
-import com.rumor.tracing.ai.dto.RumorAnalysisRequest;
-import com.rumor.tracing.ai.dto.RumorAnalysisResponse;
+import com.rumor.tracing.dto.request.DeepSeekAnalysisRequest;
+import com.rumor.tracing.dto.response.DeepSeekAnalysisResponse;
 
-public interface AIService {
+public interface DeepSeekAIService {
     
     /**
      * 分析文本内容
@@ -36,5 +36,5 @@ public interface AIService {
      */
     RumorAnalysis analyzeMultiModal(String content, String imageUrl, String videoUrl);
 
-    RumorAnalysisResponse analyzeRumor(RumorAnalysisRequest request);
+    DeepSeekAnalysisResponse analyzeRumor(DeepSeekAnalysisRequest request);
 } 

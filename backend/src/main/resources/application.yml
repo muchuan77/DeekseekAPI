@@ -79,8 +79,8 @@ logging:
 
 ai:
   service:
-    url: ${AI_SERVICE_URL:http://localhost:8081}
-    api-key: ${AI_SERVICE_API_KEY:your-api-key}
+    url: ${AI_SERVICE_URL:https://api.deepseek.com/v1}
+    api-key: ${AI_SERVICE_API_KEY:sk-c8c70eeb1e2243bf86eaa3e279549074}
     timeout: ${AI_SERVICE_TIMEOUT:30000}
 
 jwt:

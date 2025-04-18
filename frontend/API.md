@@ -812,66 +812,6 @@ API层根据功能分为不同的模块：
 }
 ```
 
-### 数据分析 (`analytics.js`)
-数据分析相关操作：
-
-#### 获取统计数据
-- 路径: `/api/analytics/statistics`
-- 方法: GET
-- 描述: 获取谣言的统计信息
-- 权限: 需要管理员权限
-- 查询参数:
-  - timeRange: 时间范围
-- 响应:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": {
-    "totalRumors": "number",
-    "verifiedRumors": "number",
-    "fakeRumors": "number",
-    "pendingRumors": "number",
-    "totalComments": "number",
-    "activeUsers": "number"
-  }
-}
-```
-
-#### 获取趋势数据
-- 路径: `/api/analytics/trends`
-- 方法: GET
-- 描述: 获取谣言的趋势信息
-- 权限: 需要管理员权限
-- 查询参数:
-  - timeRange: 时间范围
-- 响应:
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": {
-    "dailyStats": [
-      {
-        "date": "string",
-        "rumors": "number",
-        "comments": "number",
-        "users": "number"
-      }
-    ],
-    "typeDistribution": {
-      "TEXT": "number",
-      "IMAGE": "number",
-      "VIDEO": "number"
-    },
-    "tagDistribution": {
-      "tag1": "number",
-      "tag2": "number"
-    }
-  }
-}
-```
-
 ## API使用
 
 所有API模块都遵循一致的调用模式：
