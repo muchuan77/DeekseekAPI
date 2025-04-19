@@ -69,11 +69,21 @@ public class PropagationController {
     }
 
     @GetMapping("/trends/{rumorId}")
-    public ResponseEntity<Map<String, Object>> getPropagationTrends(@PathVariable Long rumorId) {
-        // 这里需要实现传播趋势分析
-        return ResponseEntity.ok(Map.of(
-            "trends", List.of() // 暂时返回空列表
-        ));
+    public ResponseEntity<Map<String, Object>> getPropagationTrends(
+            @PathVariable Long rumorId,
+            @RequestParam(defaultValue = "hour") String type) {
+        try {
+            List<Map<String, Object>> trends = propagationAnalysisService.analyzePropagationTrends(rumorId, type);
+            return ResponseEntity.ok(Map.of(
+                "code", 200,
+                "data", trends
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of(
+                "code", 500,
+                "message", "获取传播趋势失败：" + e.getMessage()
+            ));
+        }
     }
 
     @GetMapping("/key-nodes/{rumorId}")

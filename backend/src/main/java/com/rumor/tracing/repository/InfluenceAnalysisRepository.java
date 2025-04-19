@@ -15,10 +15,9 @@ public interface InfluenceAnalysisRepository extends JpaRepository<InfluenceAnal
     
     Page<InfluenceAnalysis> findByRumorIdAndIsKeyNode(Long rumorId, Boolean isKeyNode, Pageable pageable);
     
-    @Query("SELECT i FROM InfluenceAnalysis i WHERE " +
-           "i.rumor.id = :rumorId AND " +
-           "i.influenceScore >= :minScore")
-    Page<InfluenceAnalysis> findHighInfluenceNodes(@Param("rumorId") Long rumorId,
-                                                 @Param("minScore") Integer minScore,
-                                                 Pageable pageable);
+    @Query("SELECT i FROM InfluenceAnalysis i WHERE i.rumorId = :rumorId AND i.influenceScore >= :minScore")
+    Page<InfluenceAnalysis> findHighInfluenceNodes(
+            @Param("rumorId") Long rumorId,
+            @Param("minScore") Integer minScore,
+            Pageable pageable);
 } 

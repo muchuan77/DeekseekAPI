@@ -3,6 +3,7 @@ package com.rumor.tracing.entity;
 import javax.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Data
@@ -13,21 +14,29 @@ public class InfluenceAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rumor_id", nullable = false)
-    private Rumor rumor;
+    @Column(name = "rumor_id", nullable = false)
+    private Long rumorId;
 
-    @Column(nullable = false)
+    @Column(name = "node_id", nullable = false)
+    private String nodeId;
+
+    @Column(name = "influence_score", nullable = false)
     private Double influenceScore;
+
+    @Column(name = "path_count", nullable = false)
+    private Integer pathCount;
+
+    @Column(name = "is_key_node", nullable = false)
+    private Boolean isKeyNode;
+
+    @Column(name = "analysis_time", nullable = false)
+    private Long analysisTime;
 
     @Column(nullable = false)
     private Integer userCount;
 
     @Column(nullable = false)
     private Integer contentCount;
-
-    @Column(name = "is_key_node", nullable = false)
-    private Boolean isKeyNode;
 
     @ElementCollection
     @CollectionTable(name = "influence_analysis_user_influence", joinColumns = @JoinColumn(name = "analysis_id"))
@@ -39,17 +48,18 @@ public class InfluenceAnalysis {
     @Column(name = "content_influence")
     private List<String> contentInfluence;
 
-    @Column(nullable = false)
-    private LocalDateTime analysisTime;
+    @Column(name = "analysis_time_original", nullable = false)
+    private LocalDateTime analysisTimeOriginal;
 
-    @Column(nullable = false)
+    @Column(name = "analysis_status", nullable = false)
     private String analysisStatus;
 
-    @Column
+    @Column(name = "analysis_result")
     private String analysisResult;
 
     @PrePersist
     protected void onCreate() {
-        analysisTime = LocalDateTime.now();
+        analysisTimeOriginal = LocalDateTime.now();
+        analysisTime = analysisTimeOriginal.toEpochSecond(ZoneOffset.UTC);
     }
 }

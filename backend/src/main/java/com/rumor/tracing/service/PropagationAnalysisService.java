@@ -48,5 +48,5 @@ public interface PropagationAnalysisService {
      */
     Map<String, Object> getPropagationNetwork(Long rumorId);
     
-    List<Map<String, Object>> analyzePropagationTrends(Long rumorId);
+    List<Map<String, Object>> analyzePropagationTrends(Long rumorId, String type);
 }
