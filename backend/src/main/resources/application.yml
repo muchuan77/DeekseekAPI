@@ -62,7 +62,7 @@ spring:
   elasticsearch:
     rest:
       uris: http://localhost:9200
-      username: elastic
+      username: ecat
       password: yxh258012
     connection-timeout: 5000
     socket-timeout: 5000

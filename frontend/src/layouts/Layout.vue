@@ -27,6 +27,10 @@
             <el-icon><Cpu /></el-icon>
             <span>AI分析</span>
           </el-menu-item>
+          <el-menu-item index="/propagation">
+            <el-icon><Cpu /></el-icon>
+            <span>传播分析</span>
+          </el-menu-item>
           <el-menu-item index="/trace"> 
             <el-icon><Connection /></el-icon>
             <span>溯源可视化</span> 

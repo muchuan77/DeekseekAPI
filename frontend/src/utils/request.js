@@ -9,6 +9,7 @@ const service = axios.create({
   timeout: 300000, // 请求超时时间 5分钟
   retry: 3, // 重试次数
   retryDelay: 1000, // 重试间隔
+  withCredentials: true, // 允许跨域请求携带认证信息
   headers: {
     'Content-Type': 'application/json;charset=UTF-8',
     'Accept': 'application/json'
@@ -55,7 +56,12 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     const res = response.data
-    console.log("后端响应: ", res, 'code:'+res.code); // 打印响应内容，调试用
+    console.log("后端响应: ", res)
+    
+    // 如果响应是直接的数据对象（没有code字段），直接返回
+    if (res && typeof res === 'object' && !('code' in res)) {
+      return res
+    }
     
     // 如果请求不成功
     if (res.code !== 200) {
@@ -67,31 +73,26 @@ service.interceptors.response.use(
       
       // 401: 未登录或token过期
       if (res.code === 401) {
-        // 尝试刷新token
-        const refreshToken = localStorage.getItem('refreshToken')
-        if (refreshToken) {
-          return refreshTokenRequest(refreshToken)
-            .then(() => {
-              // 重新发起请求
-              return service(response.config)
-            })
-            .catch(() => {
-              // 刷新token失败，清除token并跳转登录页面
-              clearAuth()
-              router.push('/login')
-              return Promise.reject(new Error('登录已过期，请重新登录'))
-            })
-        } else {
-          clearAuth()
-          router.push('/login')
-          return Promise.reject(new Error('请先登录'))
-        }
+        router.push('/401')
+        return Promise.reject(new Error('请先登录'))
       }
       
       // 403: 无权限
       if (res.code === 403) {
-        router.push('/')
+        router.push('/403')
         return Promise.reject(new Error('无权限访问'))
+      }
+
+      // 400: 请求参数错误
+      if (res.code === 400) {
+        router.push('/400')
+        return Promise.reject(new Error('请求参数错误'))
+      }
+
+      // 500: 服务器内部错误
+      if (res.code === 500) {
+        router.push('/500')
+        return Promise.reject(new Error('服务器内部错误'))
       }
       
       return Promise.reject(new Error(res.message || '系统错误'))
@@ -107,18 +108,20 @@ service.interceptors.response.use(
       const message = res?.message || '系统错误'
       
       switch (error.response.status) {
+        case 400:
+          router.push('/400')
+          break
         case 401:
-          clearAuth()
-          router.push('/login')
+          router.push('/401')
           break
         case 403:
-          router.push('/')
+          router.push('/403')
           break
         case 404:
           router.push('/404')
           break
         case 500:
-          ElMessage.error(message)
+          router.push('/500')
           break
         default:
           ElMessage.error(message)

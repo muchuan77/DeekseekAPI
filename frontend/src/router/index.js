@@ -2,6 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '@/layouts/Layout.vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import { useAuthStore } from '@/stores/auth'
+import Error400 from '@/views/error/400.vue'
+import Error401 from '@/views/error/401.vue'
+import Error403 from '@/views/error/403.vue'
+import Error404 from '@/views/error/404.vue'
+import Error500 from '@/views/error/500.vue'
 
 const routes = [
   {
@@ -49,6 +54,12 @@ const routes = [
         meta: { title: 'AI分析' }
       },
       {
+        path: 'propagation',
+        name: 'Propagation',
+        component: () => import('@/views/Propagation.vue'),
+        meta: { title: '传播分析' }
+      },
+      {
         path: 'sync',
         name: 'Sync',
         component: () => import('@/views/SyncManagement.vue'),
@@ -89,16 +100,6 @@ const routes = [
         name: 'UserManagement',
         component: () => import('@/views/admin/UserManagement.vue'),
         meta: { title: '用户管理', roles: ['ADMIN'] }
-      },
-      {
-        path: 'user-roles',
-        name: 'UserRoles',
-        component: () => import('@/views/admin/UserRole.vue'),
-        meta: {
-          title: '用户角色管理',
-          requiresAuth: true,
-          roles: ['ADMIN']
-        }
       },
       {
         path: 'comments',
@@ -163,9 +164,52 @@ const routes = [
     ]
   },
   {
+    path: '/400',
+    name: '400',
+    component: Error400,
+    meta: {
+      title: '400 Bad Request'
+    }
+  },
+  {
+    path: '/401',
+    name: '401',
+    component: Error401,
+    meta: {
+      title: '401 Unauthorized'
+    }
+  },
+  {
+    path: '/403',
+    name: '403',
+    component: Error403,
+    meta: {
+      title: '403 Forbidden'
+    }
+  },
+  {
+    path: '/404',
+    name: '404',
+    component: Error404,
+    meta: {
+      title: '404 Not Found'
+    }
+  },
+  {
+    path: '/500',
+    name: '500',
+    component: Error500,
+    meta: {
+      title: '500 Internal Server Error'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/NotFound.vue')
+    component: Error404,
+    meta: {
+      title: '404 Not Found'
+    }
   }
 ]
 

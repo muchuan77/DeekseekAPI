@@ -71,7 +71,7 @@ export const useLogStore = defineStore('log', () => {
   const fetchUserActivityData = async (startTime, endTime) => {
     try {
       loading.value = true
-      const response = await getLogStatistics({ startTime, endTime })
+      const response = await getLogStatistics({ start: startTime, end: endTime })
       if (response.code === 200) {
         userActivityData.value = {
           dates: Object.keys(response.data.userActivityCounts),
@@ -89,7 +89,7 @@ export const useLogStore = defineStore('log', () => {
   const fetchOperationTypeData = async (startTime, endTime) => {
     try {
       loading.value = true
-      const response = await getLogStatistics({ startTime, endTime })
+      const response = await getLogStatistics({ start: startTime, end: endTime })
       if (response.code === 200) {
         operationTypeData.value = Object.entries(response.data.operationTypeCounts)
           .map(([name, value]) => ({ name, value }))

@@ -12,6 +12,7 @@ public class LogSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors().and()
             .authorizeRequests()
                 .antMatchers("/api/logs/**").hasRole("ADMIN")
                 .anyRequest().permitAll()

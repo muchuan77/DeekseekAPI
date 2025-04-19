@@ -70,9 +70,21 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedHeader("Authorization");
+        config.addAllowedHeader("Content-Type");
+        config.addAllowedHeader("Accept");
+        config.addAllowedHeader("Origin");
+        config.addAllowedHeader("X-Requested-With");
+        config.addAllowedHeader("Access-Control-Request-Method");
+        config.addAllowedHeader("Access-Control-Request-Headers");
+        config.addExposedHeader("Authorization");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("PUT");
+        config.addAllowedMethod("DELETE");
+        config.addAllowedMethod("OPTIONS");
+        config.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

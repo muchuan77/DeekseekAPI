@@ -13,6 +13,9 @@ public class LogElasticsearchConfig extends ElasticsearchConfiguration {
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
                 .connectedTo("localhost:9200")
+                .withBasicAuth("ecat", "yxh258012")
+                .withConnectTimeout(5000)
+                .withSocketTimeout(5000)
                 .build();
     }
 } 

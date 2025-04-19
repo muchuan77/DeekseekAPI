@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -124,64 +125,60 @@ public class LoggingServiceImpl implements LoggingService {
 
     @Override
     public LogStatisticsDTO getLogStatistics(LocalDateTime start, LocalDateTime end) {
-        NativeSearchQuery query = new NativeSearchQueryBuilder()
-            .withQuery(QueryBuilders.rangeQuery("executionTime")
-                .gte(start)
-                .lte(end))
-            .addAggregation(AggregationBuilders.terms("operationTypes").field("operationType"))
-            .addAggregation(AggregationBuilders.terms("users").field("username"))
-            .addAggregation(AggregationBuilders.terms("levels").field("level"))
-            .build();
-            
-        SearchHits<LogOperation> searchHits = elasticsearchOperations.search(query, LogOperation.class);
+        // 创建查询条件
+        Criteria criteria = new Criteria("executionTime").between(start, end);
         
+        // 创建查询
+        CriteriaQuery query = new CriteriaQuery(criteria);
+        
+        // 执行操作日志查询
+        SearchHits<LogOperation> operationHits = elasticsearchOperations.search(query, LogOperation.class);
+        
+        // 创建统计结果对象
         LogStatisticsDTO statistics = new LogStatisticsDTO();
+        statistics.setTotalLogs(operationHits.getTotalHits());
         
-        // 处理聚合结果
-        if (searchHits.hasAggregations()) {
-            var aggregationsContainer = searchHits.getAggregations();
-            var aggregations = (Aggregations) aggregationsContainer.aggregations();
-            
-            // 处理操作类型统计
-            Terms operationTypesAgg = (Terms) aggregations.get("operationTypes");
-            if (operationTypesAgg != null) {
-                statistics.setOperationTypeCounts(operationTypesAgg.getBuckets().stream()
-                    .collect(Collectors.toMap(
-                        Terms.Bucket::getKeyAsString,
-                        Terms.Bucket::getDocCount
-                    )));
-            }
-            
-            // 处理用户活跃度统计
-            Terms usersAgg = (Terms) aggregations.get("users");
-            if (usersAgg != null) {
-                statistics.setUserActivityCounts(usersAgg.getBuckets().stream()
-                    .collect(Collectors.toMap(
-                        Terms.Bucket::getKeyAsString,
-                        Terms.Bucket::getDocCount
-                    )));
-            }
-            
-            // 处理日志级别统计
-            Terms levelsAgg = (Terms) aggregations.get("levels");
-            if (levelsAgg != null) {
-                for (Terms.Bucket bucket : levelsAgg.getBuckets()) {
-                    String level = bucket.getKeyAsString();
-                    long count = bucket.getDocCount();
-                    switch (level) {
-                        case "ERROR":
-                            statistics.setErrorLogs(count);
-                            break;
-                        case "WARN":
-                            statistics.setWarningLogs(count);
-                            break;
-                        case "INFO":
-                            statistics.setInfoLogs(count);
-                            break;
-                    }
-                }
-            }
-        }
+        // 手动统计操作类型
+        Map<String, Long> operationTypeCounts = operationHits.stream()
+            .map(SearchHit::getContent)
+            .collect(Collectors.groupingBy(
+                LogOperation::getOperationType,
+                Collectors.counting()
+            ));
+        statistics.setOperationTypeCounts(operationTypeCounts);
+        
+        // 手动统计用户活跃度
+        Map<String, Long> userActivityCounts = operationHits.stream()
+            .map(SearchHit::getContent)
+            .collect(Collectors.groupingBy(
+                LogOperation::getUsername,
+                Collectors.counting()
+            ));
+        statistics.setUserActivityCounts(userActivityCounts);
+        
+        // 查询系统日志以获取日志级别统计
+        Criteria systemCriteria = new Criteria("logTime").between(start, end);
+        CriteriaQuery systemQuery = new CriteriaQuery(systemCriteria);
+        SearchHits<LogSystem> systemHits = elasticsearchOperations.search(systemQuery, LogSystem.class);
+        
+        // 统计日志级别
+        long errorLogs = systemHits.stream()
+            .map(SearchHit::getContent)
+            .filter(log -> "ERROR".equals(log.getLevel()))
+            .count();
+        statistics.setErrorLogs(errorLogs);
+        
+        long warningLogs = systemHits.stream()
+            .map(SearchHit::getContent)
+            .filter(log -> "WARN".equals(log.getLevel()))
+            .count();
+        statistics.setWarningLogs(warningLogs);
+        
+        long infoLogs = systemHits.stream()
+            .map(SearchHit::getContent)
+            .filter(log -> "INFO".equals(log.getLevel()))
+            .count();
+        statistics.setInfoLogs(infoLogs);
         
         return statistics;
     }

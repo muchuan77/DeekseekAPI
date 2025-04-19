@@ -66,9 +66,22 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="250">
+        <el-table-column label="角色" width="200">
+          <template #default="{ row }">
+            <el-tag 
+              v-for="role in row.roles" 
+              :key="role"
+              :type="role === 'ADMIN' ? 'danger' : (role === 'MODERATOR' ? 'warning' : 'primary')"
+              class="mx-1"
+            >
+              {{ role === 'ADMIN' ? '管理员' : (role === 'MODERATOR' ? '审核员' : '普通用户') }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="300">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
+            <el-button type="warning" size="small" @click="handleEditRoles(row)">角色</el-button>
             <el-button type="warning" size="small" @click="handleResetPassword(row)">重置密码</el-button>
             <el-button 
               type="danger" 
@@ -161,6 +174,32 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 编辑角色对话框 -->
+    <el-dialog
+      v-model="roleDialogVisible"
+      title="编辑用户角色"
+      width="30%"
+    >
+      <el-form :model="roleForm" label-width="80px">
+        <el-form-item label="用户名">
+          <el-input v-model="roleForm.username" disabled />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-checkbox-group v-model="selectedRoles">
+            <el-checkbox value="ADMIN">管理员</el-checkbox>
+            <el-checkbox value="MODERATOR">审核员</el-checkbox>
+            <el-checkbox value="USER">普通用户</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="roleDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitRoles">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -168,6 +207,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { userApi } from '@/api/user'
+import { getUserRoles, updateUserRoles } from '@/api/permission'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -180,6 +220,13 @@ const dialogTitle = ref('')
 const formRef = ref(null)
 const resetPasswordDialogVisible = ref(false)
 const selectedUser = ref(null)
+const roleDialogVisible = ref(false)
+const roleForm = reactive({
+  userId: '',
+  username: '',
+  roles: []
+})
+const selectedRoles = ref([])
 
 const currentUser = JSON.parse(localStorage.getItem('user'))
 
@@ -388,28 +435,53 @@ const confirmBatchDelete = async () => {
 }
 
 // 导出用户
-const handleExport = () => {
-  window.open('/api/users/export', '_blank')
+const handleExport = async () => {
+  try {
+    const response = await userApi.exportUsers({
+      keyword: searchForm.keyword,
+      status: searchForm.status
+    })
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `users_${new Date().getTime()}.xlsx`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    ElMessage.error('导出失败')
+  }
 }
 
 // 导入成功处理
 const handleImportSuccess = (response) => {
-  if (response.success) {
-    const { successCount, errorCount, errors } = response.data
-    let message = `导入成功 ${successCount} 条，失败 ${errorCount} 条`
-    if (errors && errors.length > 0) {
-      message += '\n失败原因：\n' + errors.join('\n')
-    }
-    ElMessage.success(message)
-    fetchUsers()
-  } else {
-    ElMessage.error(response.message || '导入失败')
-  }
+  ElMessage.success('导入成功')
+  fetchUsers()
 }
 
 // 导入失败处理
 const handleImportError = (error) => {
   ElMessage.error(error.message || '导入失败')
+}
+
+// 打开编辑角色对话框
+const handleEditRoles = (row) => {
+  roleForm.userId = row.id
+  roleForm.username = row.username
+  selectedRoles.value = [...row.roles]
+  roleDialogVisible.value = true
+}
+
+// 提交角色修改
+const submitRoles = async () => {
+  try {
+    await userApi.updateUserRoles(roleForm.userId, selectedRoles.value)
+    ElMessage.success('角色更新成功')
+    roleDialogVisible.value = false
+    fetchUsers()
+  } catch (error) {
+    ElMessage.error('更新角色失败')
+  }
 }
 
 onMounted(() => {

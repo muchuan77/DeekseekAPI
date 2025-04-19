@@ -88,10 +88,10 @@
           </el-form-item>
           <el-form-item label="同步数据类型">
             <el-checkbox-group v-model="syncSettings.dataTypes" @change="handleSettingsChange">
-              <el-checkbox label="user">用户数据</el-checkbox>
-              <el-checkbox label="rumor">谣言数据</el-checkbox>
-              <el-checkbox label="analysis">分析数据</el-checkbox>
-              <el-checkbox label="blockchain">区块链数据</el-checkbox>
+              <el-checkbox value="user">用户数据</el-checkbox>
+              <el-checkbox value="rumor">谣言数据</el-checkbox>
+              <el-checkbox value="analysis">分析数据</el-checkbox>
+              <el-checkbox value="blockchain">区块链数据</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
         </el-form>
@@ -126,36 +126,26 @@
   // 方法
   const startSync = async () => {
     try {
-      syncStatus.value = 'syncing'
-      syncError.value = null
-      isSyncing.value = true
+      // 获取当前时间作为结束时间
+      const endTime = new Date()
+      // 获取30天前的时间作为开始时间
+      const startTime = new Date()
+      startTime.setDate(startTime.getDate() - 30)
       
-      // 同步谣言数据
-      if (syncSettings.value.dataTypes.includes('rumor')) {
-        await getRumors()
+      // 调用获取日志统计数据的接口
+      const response = await getLogStatistics({ 
+        start: startTime.toISOString(),
+        end: endTime.toISOString()
+      })
+      
+      if (response.code === 200) {
+        // 处理响应数据
+        console.log('日志统计数据:', response.data)
+      } else {
+        console.error('获取日志统计数据失败:', response.message)
       }
-      
-      // 同步日志数据
-      if (syncSettings.value.dataTypes.includes('analysis')) {
-        await getLogStatistics()
-      }
-      
-      // 同步系统配置
-      if (syncSettings.value.dataTypes.includes('system')) {
-        await getSystemConfig()
-      }
-      
-      lastSyncTime.value = new Date().toISOString()
-      syncStatus.value = 'success'
-      formattedLastSyncTime.value = new Date().toLocaleString()
-      ElMessage.success('数据同步成功')
     } catch (error) {
-      syncStatus.value = 'error'
-      syncError.value = error.message
-      hasError.value = true
-      ElMessage.error('数据同步失败：' + error.message)
-    } finally {
-      isSyncing.value = false
+      console.error('同步过程中发生错误:', error)
     }
   }
   

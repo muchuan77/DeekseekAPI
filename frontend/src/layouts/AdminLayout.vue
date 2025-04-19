@@ -21,10 +21,6 @@
           <el-icon><el-icon-user-filled /></el-icon>
           <span>用户管理</span>
         </el-menu-item>
-        <el-menu-item v-if="hasRole('ADMIN')" index="/admin/user-roles">
-          <el-icon><el-icon-user /></el-icon>
-          <span>用户角色管理</span>
-        </el-menu-item>
         <el-menu-item v-if="hasRole('ADMIN') || hasRole('MODERATOR')" index="/admin/comments">
           <el-icon><el-icon-chat-dot-round /></el-icon>
           <span>评论管理</span>

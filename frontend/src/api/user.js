@@ -20,24 +20,14 @@ export const userApi = {
       url: '/api/users',
       method: 'get',
       params
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
     })
   },
 
-  // 获取单个用户
+  // 获取用户详情
   getUser(id) {
     return request({
       url: `/api/users/${id}`,
       method: 'get'
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
     })
   },
 
@@ -47,11 +37,6 @@ export const userApi = {
       url: '/api/users',
       method: 'post',
       data
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
     })
   },
 
@@ -61,11 +46,6 @@ export const userApi = {
       url: `/api/users/${id}`,
       method: 'put',
       data
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
     })
   },
 
@@ -74,11 +54,6 @@ export const userApi = {
     return request({
       url: `/api/users/${id}`,
       method: 'delete'
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
     })
   },
 
@@ -87,12 +62,16 @@ export const userApi = {
     return request({
       url: `/api/users/${id}/status`,
       method: 'put',
-      data: { status }
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
+      params: { status }
+    })
+  },
+
+  // 更新用户角色
+  updateUserRoles(id, roles) {
+    return request({
+      url: `/api/users/${id}/roles`,
+      method: 'put',
+      data: roles
     })
   },
 
@@ -101,70 +80,34 @@ export const userApi = {
     return request({
       url: `/api/users/${id}/reset-password`,
       method: 'post'
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
     })
   },
 
   // 修改密码
-  changePassword(id, data) {
+  changePassword(id, oldPassword, newPassword) {
     return request({
       url: `/api/users/${id}/change-password`,
       method: 'post',
-      data
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
+      params: { oldPassword, newPassword }
     })
   },
 
-  // 批量删除用户
-  batchDelete(userIds) {
+  // 批量更新状态
+  batchUpdateStatus(ids, status) {
     return request({
-      url: '/api/users/batch-delete',
+      url: '/api/users/batch/status',
       method: 'post',
-      data: { userIds }
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
+      data: ids,
+      params: { status }
     })
   },
 
-  // 批量更新用户状态
-  batchUpdateStatus(userIds, status) {
+  // 批量删除
+  batchDelete(ids) {
     return request({
-      url: '/api/users/batch-update-status',
+      url: '/api/users/batch/delete',
       method: 'post',
-      data: { userIds, status }
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
-    })
-  },
-
-  // 导出用户
-  exportUsers() {
-    return request({
-      url: '/api/users/export',
-      method: 'get',
-      responseType: 'blob'
-    }).then(response => {
-      const url = window.URL.createObjectURL(new Blob([response]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', `users_${new Date().getTime()}.xlsx`)
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      data: ids
     })
   },
 
@@ -179,11 +122,32 @@ export const userApi = {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
+    })
+  },
+
+  // 导出用户
+  exportUsers(params) {
+    return request({
+      url: '/api/users/export',
+      method: 'get',
+      params,
+      responseType: 'blob'
+    })
+  },
+
+  // 锁定用户
+  lockUser(id) {
+    return request({
+      url: `/api/users/${id}/lock`,
+      method: 'post'
+    })
+  },
+
+  // 解锁用户
+  unlockUser(id) {
+    return request({
+      url: `/api/users/${id}/unlock`,
+      method: 'post'
     })
   }
 } 
