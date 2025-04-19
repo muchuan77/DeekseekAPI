@@ -8,6 +8,7 @@
             <el-radio-button value="text">文本分析</el-radio-button>
             <el-radio-button value="image">图片分析</el-radio-button>
             <el-radio-button value="video">视频分析</el-radio-button>
+            <el-radio-button value="multimodal">多模态分析</el-radio-button>
           </el-radio-group>
         </div>
       </template>
@@ -70,6 +71,72 @@
         </el-upload>
         <div class="button-group">
           <el-button type="primary" @click="analyzeVideoContent" :loading="loading">
+            开始分析
+          </el-button>
+        </div>
+      </div>
+
+      <!-- 多模态分析 -->
+      <div v-if="analysisType === 'multimodal'" class="multimodal-analysis">
+        <div class="text-input">
+          <el-input
+            v-model="textContent"
+            type="textarea"
+            :rows="4"
+            placeholder="请输入要分析的文本内容（可选）"
+          />
+        </div>
+        
+        <div class="image-upload">
+          <el-upload
+            class="upload-demo"
+            drag
+            action="#"
+            :auto-upload="false"
+            :on-change="handleImageChange"
+            :show-file-list="false"
+            :before-upload="beforeImageUpload"
+          >
+            <el-icon class="el-icon--upload">
+              <component :is="icons.Upload" />
+            </el-icon>
+            <div class="el-upload__text">
+              拖拽图片到此处或 <em>点击上传</em>
+            </div>
+            <template #tip>
+              <div class="el-upload__tip">
+                支持 jpg/png 格式，大小不超过 5MB
+              </div>
+            </template>
+          </el-upload>
+        </div>
+        
+        <div class="video-upload">
+          <el-upload
+            class="upload-demo"
+            drag
+            action="#"
+            :auto-upload="false"
+            :on-change="handleVideoChange"
+            :show-file-list="false"
+            :before-upload="beforeVideoUpload"
+          >
+            <el-icon class="el-icon--upload">
+              <component :is="icons.Upload" />
+            </el-icon>
+            <div class="el-upload__text">
+              拖拽视频到此处或 <em>点击上传</em>
+            </div>
+            <template #tip>
+              <div class="el-upload__tip">
+                支持 mp4 格式，大小不超过 50MB
+              </div>
+            </template>
+          </el-upload>
+        </div>
+        
+        <div class="button-group">
+          <el-button type="primary" @click="analyzeMultiModalContent" :loading="loading">
             开始分析
           </el-button>
         </div>
@@ -481,6 +548,85 @@ const analyzeVideoContent = async () => {
     loading.value = false
   }
 }
+
+// 文件上传前的验证
+const beforeImageUpload = (file) => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('只能上传 JPG/PNG 格式的图片!')
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error('图片大小不能超过 5MB!')
+    return false
+  }
+  return true
+}
+
+const beforeVideoUpload = (file) => {
+  const isVideo = file.type === 'video/mp4'
+  const isLt50M = file.size / 1024 / 1024 < 50
+
+  if (!isVideo) {
+    ElMessage.error('只能上传 MP4 格式的视频!')
+    return false
+  }
+  if (!isLt50M) {
+    ElMessage.error('视频大小不能超过 50MB!')
+    return false
+  }
+  return true
+}
+
+// 多模态分析
+const analyzeMultiModalContent = async () => {
+  if (!textContent.value && !imageFile.value && !videoFile.value) {
+    ElMessage.warning('请至少提供一种分析内容')
+    return
+  }
+  
+  loading.value = true
+  startProgressSimulation()
+  
+  try {
+    const formData = new FormData()
+    
+    // 添加文本内容
+    if (textContent.value) {
+      formData.append('content', textContent.value)
+    }
+    
+    // 添加图片文件
+    if (imageFile.value) {
+      formData.append('image', imageFile.value)
+    }
+    
+    // 添加视频文件
+    if (videoFile.value) {
+      formData.append('video', videoFile.value)
+    }
+    
+    formData.append('type', 'MULTIMODAL')
+    formData.append('source', 'user_input')
+    formData.append('title', '多模态分析')
+    
+    const result = await analyzeMultiModal(formData)
+    if (result && result.code === 200) {
+      analysisResult.value = result.data
+      ElMessage.success('分析完成')
+    } else {
+      ElMessage.error(result?.message || '分析失败')
+    }
+  } catch (error) {
+    console.error('分析失败:', error)
+    ElMessage.error(error.response?.data?.message || error.message || '分析失败')
+  } finally {
+    stopProgressSimulation()
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -642,5 +788,49 @@ const analyzeVideoContent = async () => {
 :deep(.el-card__header) {
   padding: 12px 20px;
   border-bottom: 1px solid #e4e7ed;
+}
+
+.multimodal-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.text-input {
+  margin-bottom: 20px;
+}
+
+.image-upload,
+.video-upload {
+  margin-bottom: 20px;
+}
+
+.upload-demo {
+  width: 100%;
+}
+
+.el-upload__tip {
+  color: #909399;
+  font-size: 12px;
+  margin-top: 7px;
+}
+
+.el-upload-dragger {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.el-upload__text {
+  margin-top: 10px;
+  color: #606266;
+}
+
+.el-upload__text em {
+  color: #409EFF;
+  font-style: normal;
 }
 </style> 

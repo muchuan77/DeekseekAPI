@@ -67,9 +67,7 @@ export function analyzeImage(data) {
     headers: {
       'Content-Type': 'multipart/form-data'
     },
-    data: {
-      content: data
-    }
+    data: data
   }).catch(error => handleApiError(error, '图像分析'))
 }
 
@@ -82,10 +80,21 @@ export function analyzeVideo(data) {
     headers: {
       'Content-Type': 'multipart/form-data'
     },
-    data: {
-      content: data
-    }
+    data: data
   }).catch(error => handleApiError(error, '视频分析'))
+}
+
+// 多模态分析
+export function analyzeMultiModal(data) {
+  return request({
+    url: '/api/deepseek/analyze/multimodal',
+    method: 'post',
+    timeout: 300000, // 5分钟超时设置
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    data: data
+  }).catch(error => handleApiError(error, '多模态分析'))
 }
 
 // 获取分析结果

@@ -27,10 +27,6 @@
             <el-icon><Cpu /></el-icon>
             <span>AI分析</span>
           </el-menu-item>
-          <el-menu-item index="/multimodal">
-            <el-icon><PictureFilled /></el-icon>
-            <span>多模态分析</span>
-          </el-menu-item>
           <el-menu-item index="/trace"> 
             <el-icon><Connection /></el-icon>
             <span>溯源可视化</span> 

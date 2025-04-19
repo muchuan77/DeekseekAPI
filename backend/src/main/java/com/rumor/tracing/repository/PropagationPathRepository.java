@@ -25,6 +25,31 @@ public interface PropagationPathRepository extends JpaRepository<PropagationPath
                                          @Param("nodeId") String nodeId, 
                                          Pageable pageable);
 
+    @Query("SELECT p FROM PropagationPath p WHERE " +
+           "p.rumorId = :rumorId AND " +
+           "p.propagationTime BETWEEN :startTime AND :endTime")
+    Page<PropagationPath> findByRumorIdAndPropagationTimeBetween(
+            @Param("rumorId") Long rumorId,
+            @Param("startTime") Long startTime,
+            @Param("endTime") Long endTime,
+            Pageable pageable);
+
+    @Query("SELECT p FROM PropagationPath p WHERE " +
+           "p.rumorId = :rumorId AND " +
+           "p.propagationTime >= :startTime")
+    Page<PropagationPath> findByRumorIdAndPropagationTimeGreaterThanEqual(
+            @Param("rumorId") Long rumorId,
+            @Param("startTime") Long startTime,
+            Pageable pageable);
+
+    @Query("SELECT p FROM PropagationPath p WHERE " +
+           "p.rumorId = :rumorId AND " +
+           "p.propagationTime <= :endTime")
+    Page<PropagationPath> findByRumorIdAndPropagationTimeLessThanEqual(
+            @Param("rumorId") Long rumorId,
+            @Param("endTime") Long endTime,
+            Pageable pageable);
+
     List<PropagationPath> findByRumorIdAndType(Long rumorId, PropagationType type);
     List<PropagationPath> findBySourceNode(String sourceNode);
     List<PropagationPath> findByTargetNode(String targetNode);

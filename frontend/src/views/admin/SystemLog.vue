@@ -66,16 +66,16 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import axios from 'axios'
+import { useLogStore } from '@/stores/log'
 import { format } from 'date-fns'
 
 export default {
   name: 'SystemLog',
   setup() {
+    const logStore = useLogStore()
     const loading = ref(false)
-    const logs = ref([])
     const currentPage = ref(1)
     const pageSize = ref(10)
     const total = ref(0)
@@ -88,17 +88,14 @@ export default {
     const fetchLogs = async () => {
       loading.value = true
       try {
-        const response = await axios.get('/api/logs/system', {
-          params: {
-            page: currentPage.value - 1,
-            size: pageSize.value,
-            level: searchForm.level,
-            startDate: searchForm.dateRange?.[0],
-            endDate: searchForm.dateRange?.[1]
-          }
+        await logStore.fetchSystemLogs({
+          page: currentPage.value - 1,
+          size: pageSize.value,
+          level: searchForm.level,
+          startTime: searchForm.dateRange?.[0],
+          endTime: searchForm.dateRange?.[1]
         })
-        logs.value = response.data.data.content
-        total.value = response.data.data.totalElements
+        total.value = logStore.systemLogs.length
       } catch (error) {
         ElMessage.error('获取系统日志失败')
         console.error(error)
@@ -151,7 +148,7 @@ export default {
 
     return {
       loading,
-      logs,
+      logs: computed(() => logStore.systemLogs),
       currentPage,
       pageSize,
       total,

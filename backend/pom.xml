@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
+        <version>2.7.12</version>
         <relativePath/>
     </parent>
 
@@ -21,6 +21,7 @@
         <java.version>18</java.version>
         <spring-cloud.version>2021.0.3</spring-cloud.version>
         <elasticsearch.version>7.17.4</elasticsearch.version>
+        <spring-data-elasticsearch.version>4.4.0</spring-data-elasticsearch.version>
         <jwt.version>0.11.5</jwt.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <openapi.version>1.6.9</openapi.version>
@@ -73,6 +74,26 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client-sniffer</artifactId>
+            <version>${elasticsearch.version}</version>
         </dependency>
 
         <!-- JWT -->
@@ -180,6 +201,19 @@
             <version>2.0.1.Final</version>
         </dependency>
         
+        <!-- 添加 Jakarta JSON API 依赖 -->
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        
+        <!-- 添加 Jakarta JSON 实现依赖 -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>2.0.1</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

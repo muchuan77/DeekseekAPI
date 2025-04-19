@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取系统配置
 export function getSystemConfig() {
   return request({
-    url: '/system/config',
+    url: '/api/system/config',
     method: 'get'
   })
 }
@@ -11,7 +11,7 @@ export function getSystemConfig() {
 // 更新系统配置
 export function updateSystemConfig(data) {
   return request({
-    url: '/system/config',
+    url: '/api/system/config',
     method: 'put',
     data
   })
@@ -20,7 +20,7 @@ export function updateSystemConfig(data) {
 // 获取系统日志
 export function getSystemLogs(params) {
   return request({
-    url: '/system/logs',
+    url: '/api/system/logs',
     method: 'get',
     params
   })
@@ -29,7 +29,7 @@ export function getSystemLogs(params) {
 // 获取系统指标
 export function getSystemMetrics() {
   return request({
-    url: '/system/metrics',
+    url: '/api/system/metrics',
     method: 'get'
   })
 }
@@ -37,7 +37,7 @@ export function getSystemMetrics() {
 // 获取系统状态
 export function getSystemStatus() {
   return request({
-    url: '/system/status',
+    url: '/api/system/status',
     method: 'get'
   })
 }
@@ -53,7 +53,7 @@ export function getSystemResources() {
 // 获取系统性能指标
 export function getSystemPerformance() {
   return request({
-    url: '/system/performance',
+    url: '/api/system/performance',
     method: 'get'
   })
 }
@@ -61,7 +61,7 @@ export function getSystemPerformance() {
 // 获取系统告警信息
 export function getSystemAlerts(params) {
   return request({
-    url: '/system/alerts',
+    url: '/api/system/alerts',
     method: 'get',
     params
   })
@@ -70,7 +70,7 @@ export function getSystemAlerts(params) {
 // 更新系统告警状态
 export function updateAlertStatus(id, data) {
   return request({
-    url: `/system/alerts/${id}/status`,
+    url: `/api/system/alerts/${id}/status`,
     method: 'put',
     data
   })

@@ -89,6 +89,8 @@ import {
 import VChart from 'vue-echarts'
 import { usePropagationStore } from '@/stores/propagation'
 import { formatDate } from '@/utils/date'
+import { useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
 use([
   CanvasRenderer,
@@ -99,11 +101,12 @@ use([
   GridComponent
 ])
 
+const route = useRoute()
 const propagationStore = usePropagationStore()
 
 // 搜索表单
 const searchForm = ref({
-  rumorId: '',
+  rumorId: route.params.id || '',
   dateRange: []
 })
 
@@ -183,21 +186,23 @@ const viewDetail = (row) => {
   console.log('查看详情:', row)
 }
 
-// 处理分页大小变化
-const handleSizeChange = async (val) => {
-  pageSize.value = val
-  await loadData()
-}
-
-// 处理页码变化
-const handleCurrentChange = async (val) => {
-  currentPage.value = val
-  await loadData()
-}
-
 // 加载数据
 const loadData = async () => {
   try {
+    if (!searchForm.value.rumorId) {
+      ElMessage.warning('请输入谣言ID')
+      return
+    }
+    
+    // 验证日期范围
+    if (searchForm.value.dateRange?.length === 2) {
+      const [start, end] = searchForm.value.dateRange
+      if (new Date(start) > new Date(end)) {
+        ElMessage.warning('结束日期不能早于开始日期')
+        return
+      }
+    }
+    
     await propagationStore.fetchTraceData({
       rumorId: searchForm.value.rumorId,
       startDate: searchForm.value.dateRange[0],
@@ -206,8 +211,29 @@ const loadData = async () => {
       pageSize: pageSize.value
     })
   } catch (error) {
+    // 错误已经在store中处理，这里只做日志记录
     console.error('加载数据失败:', error)
   }
+}
+
+// 处理分页大小变化
+const handleSizeChange = async (val) => {
+  if (val < 1 || val > 100) {
+    ElMessage.warning('每页显示数量必须在1-100之间')
+    return
+  }
+  pageSize.value = val
+  await loadData()
+}
+
+// 处理页码变化
+const handleCurrentChange = async (val) => {
+  if (val < 1) {
+    ElMessage.warning('页码不能小于1')
+    return
+  }
+  currentPage.value = val
+  await loadData()
 }
 
 onMounted(() => {

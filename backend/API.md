@@ -935,9 +935,11 @@ API层根据功能分为不同的模块：
 - 路径: `/api/logs/system`
 - 方法: GET
 - 描述: 分页获取系统日志信息
-- 前端实现: `frontend/src/api/log.js`
+- 权限: 需要 ADMIN 角色
 - 查询参数:
-  - level: 日志级别
+  - level: 日志级别 (ERROR/WARN/INFO)
+  - startTime: 开始时间 (ISO 8601格式)
+  - endTime: 结束时间 (ISO 8601格式)
   - page: 页码（默认0）
   - size: 每页大小（默认10）
 - 响应:
@@ -951,7 +953,16 @@ API层根据功能分为不同的模块：
         "id": "string",
         "level": "string",
         "message": "string",
-        "createdAt": "string"
+        "source": "string",
+        "applicationName": "string",
+        "stackTrace": "string",
+        "responseTime": "number",
+        "logTime": "string",
+        "createdAt": "string",
+        "updatedAt": "string",
+        "createdBy": "string",
+        "updatedBy": "string",
+        "version": "number"
       }
     ],
     "totalElements": "number",
@@ -961,18 +972,17 @@ API层根据功能分为不同的模块：
   }
 }
 ```
-- 状态码:
-  - 200: 获取成功
-  - 500: 服务器内部错误
 
 #### 获取操作日志
 - 路径: `/api/logs/operation`
 - 方法: GET
 - 描述: 分页获取操作日志信息
-- 前端实现: `frontend/src/api/log.js`
+- 权限: 需要 ADMIN 角色
 - 查询参数:
-  - operationType: 操作类型
   - username: 用户名
+  - operationType: 操作类型
+  - startTime: 开始时间 (ISO 8601格式)
+  - endTime: 结束时间 (ISO 8601格式)
   - page: 页码（默认0）
   - size: 每页大小（默认10）
 - 响应:
@@ -984,10 +994,18 @@ API层根据功能分为不同的模块：
     "content": [
       {
         "id": "string",
-        "operationType": "string",
+        "userId": "number",
         "username": "string",
-        "message": "string",
-        "createdAt": "string"
+        "operationType": "string",
+        "targetType": "string",
+        "targetId": "number",
+        "details": "string",
+        "executionTime": "string",
+        "createdAt": "string",
+        "updatedAt": "string",
+        "createdBy": "string",
+        "updatedBy": "string",
+        "version": "number"
       }
     ],
     "totalElements": "number",
@@ -997,18 +1015,17 @@ API层根据功能分为不同的模块：
   }
 }
 ```
-- 状态码:
-  - 200: 获取成功
-  - 500: 服务器内部错误
 
 #### 获取审计日志
 - 路径: `/api/logs/audit`
 - 方法: GET
 - 描述: 分页获取审计日志信息
-- 前端实现: `frontend/src/api/log.js`
+- 权限: 需要 ADMIN 角色
 - 查询参数:
-  - auditType: 审计类型
   - username: 用户名
+  - targetType: 目标类型
+  - startTime: 开始时间 (ISO 8601格式)
+  - endTime: 结束时间 (ISO 8601格式)
   - page: 页码（默认0）
   - size: 每页大小（默认10）
 - 响应:
@@ -1020,10 +1037,18 @@ API层根据功能分为不同的模块：
     "content": [
       {
         "id": "string",
-        "auditType": "string",
+        "userId": "number",
         "username": "string",
-        "message": "string",
-        "createdAt": "string"
+        "action": "string",
+        "targetType": "string",
+        "targetId": "number",
+        "details": "string",
+        "auditTime": "string",
+        "createdAt": "string",
+        "updatedAt": "string",
+        "createdBy": "string",
+        "updatedBy": "string",
+        "version": "number"
       }
     ],
     "totalElements": "number",
@@ -1033,9 +1058,104 @@ API层根据功能分为不同的模块：
   }
 }
 ```
-- 状态码:
-  - 200: 获取成功
-  - 500: 服务器内部错误
+
+#### 获取日志统计
+- 路径: `/api/logs/statistics`
+- 方法: GET
+- 描述: 获取日志统计信息
+- 权限: 需要 ADMIN 角色
+- 查询参数:
+  - startTime: 开始时间 (ISO 8601格式)
+  - endTime: 结束时间 (ISO 8601格式)
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "totalLogs": "number",
+    "errorLogs": "number",
+    "warningLogs": "number",
+    "infoLogs": "number",
+    "operationTypeCounts": {
+      "key": "number"
+    },
+    "userActivityCounts": {
+      "key": "number"
+    }
+  }
+}
+```
+
+#### 获取日志趋势
+- 路径: `/api/logs/trends`
+- 方法: GET
+- 描述: 获取日志趋势数据
+- 权限: 需要 ADMIN 角色
+- 查询参数:
+  - startTime: 开始时间 (ISO 8601格式)
+  - endTime: 结束时间 (ISO 8601格式)
+  - interval: 时间间隔 (hour/day/week/month)
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "timestamp": "string",
+      "count": "number",
+      "type": "string"
+    }
+  ]
+}
+```
+
+#### 获取错误详情
+- 路径: `/api/logs/errors/{type}`
+- 方法: GET
+- 描述: 获取特定类型的错误详情
+- 权限: 需要 ADMIN 角色
+- 查询参数:
+  - startTime: 开始时间 (ISO 8601格式)
+  - endTime: 结束时间 (ISO 8601格式)
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "timestamp": "string",
+      "type": "string",
+      "message": "string",
+      "stackTrace": "string"
+    }
+  ]
+}
+```
+
+#### 获取服务健康状态
+- 路径: `/api/logs/services/{name}/health`
+- 方法: GET
+- 描述: 获取特定服务的健康状态
+- 权限: 需要 ADMIN 角色
+- 查询参数:
+  - startTime: 开始时间 (ISO 8601格式)
+  - endTime: 结束时间 (ISO 8601格式)
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "serviceName": "string",
+    "availability": "number",
+    "responseTime": "number",
+    "errorCount": "number"
+  }
+}
+```
 
 ## 错误码说明
 

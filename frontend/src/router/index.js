@@ -49,12 +49,6 @@ const routes = [
         meta: { title: 'AI分析' }
       },
       {
-        path: 'multimodal',
-        name: 'Multimodal',
-        component: () => import('@/views/MultimodalAnalysis.vue'),
-        meta: { title: '多模态分析' }
-      },
-      {
         path: 'sync',
         name: 'Sync',
         component: () => import('@/views/SyncManagement.vue'),
@@ -95,6 +89,16 @@ const routes = [
         name: 'UserManagement',
         component: () => import('@/views/admin/UserManagement.vue'),
         meta: { title: '用户管理', roles: ['ADMIN'] }
+      },
+      {
+        path: 'user-roles',
+        name: 'UserRoles',
+        component: () => import('@/views/admin/UserRole.vue'),
+        meta: {
+          title: '用户角色管理',
+          requiresAuth: true,
+          roles: ['ADMIN']
+        }
       },
       {
         path: 'comments',
@@ -156,16 +160,6 @@ const routes = [
         component: () => import('@/views/admin/Profile.vue'),
         meta: { title: '管理员信息', roles: ['ADMIN'] }
       },
-      {
-        path: 'user-roles',
-        name: 'UserRoles',
-        component: () => import('@/views/admin/UserRole.vue'),
-        meta: {
-          title: '用户角色管理',
-          requiresAuth: true,
-          roles: ['ADMIN']
-        }
-      }
     ]
   },
   {

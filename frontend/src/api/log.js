@@ -1,16 +1,16 @@
 import request from '@/utils/request'
 
-export function getOperationLogs(params) {
+export function getSystemLogs(params) {
   return request({
-    url: '/api/logs/operation',
+    url: '/api/logs/system',
     method: 'get',
     params
   })
 }
 
-export function getSystemLogs(params) {
+export function getOperationLogs(params) {
   return request({
-    url: '/api/logs/system',
+    url: '/api/logs/operation',
     method: 'get',
     params
   })
@@ -24,34 +24,34 @@ export function getAuditLogs(params) {
   })
 }
 
-export function getLogStatistics(start, end) {
+export function getLogStatistics(params) {
   return request({
-    url: '/logs/visualization/statistics',
+    url: '/api/logs/statistics',
     method: 'get',
-    params: { start, end }
+    params
   })
 }
 
-export function getLogTrends(start, end, interval) {
+export function getLogTrends(params) {
   return request({
-    url: '/logs/visualization/trends',
+    url: '/api/logs/trends',
     method: 'get',
-    params: { start, end, interval }
+    params
   })
 }
 
-export function getErrorDetails(errorType, start, end) {
+export function getErrorDetails(type, params) {
   return request({
-    url: `/logs/visualization/errors/${errorType}`,
+    url: `/api/logs/errors/${type}`,
     method: 'get',
-    params: { start, end }
+    params
   })
 }
 
-export function getServiceHealth(serviceName, start, end) {
+export function getServiceHealth(name, params) {
   return request({
-    url: `/logs/visualization/services/${serviceName}/health`,
+    url: `/api/logs/services/${name}/health`,
     method: 'get',
-    params: { start, end }
+    params
   })
 } 

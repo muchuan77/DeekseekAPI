@@ -1,74 +1,32 @@
 package com.rumor.tracing.service;
 
-import com.rumor.tracing.entity.es.AuditLog;
-import com.rumor.tracing.entity.es.OperationLog;
-import com.rumor.tracing.entity.es.SystemLog;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.Criteria;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.stereotype.Service;
+import com.rumor.tracing.dto.LogStatisticsDTO;
+import com.rumor.tracing.dto.LogTrendDTO;
+import com.rumor.tracing.dto.LogErrorDetailDTO;
+import com.rumor.tracing.dto.LogServiceHealthDTO;
+import com.rumor.tracing.entity.LogAudit;
+import com.rumor.tracing.entity.LogOperation;
+import com.rumor.tracing.entity.LogSystem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-public class LoggingService {
+public interface LoggingService {
+    // 基础日志保存方法
+    void saveOperationLog(LogOperation log);
+    void saveSystemLog(LogSystem log);
+    void saveAuditLog(LogAudit log);
 
-    private final ElasticsearchOperations elasticsearchOperations;
+    // 基础日志查询方法
+    Page<LogOperation> searchOperationLogs(String username, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
+    Page<LogSystem> searchSystemLogs(String level, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
+    Page<LogAudit> searchAuditLogs(String username, String entityType, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 
-    public void saveOperationLog(OperationLog log) {
-        elasticsearchOperations.save(log);
-    }
-
-    public void saveSystemLog(SystemLog log) {
-        elasticsearchOperations.save(log);
-    }
-
-    public void saveAuditLog(AuditLog log) {
-        elasticsearchOperations.save(log);
-    }
-
-    public List<OperationLog> searchOperationLogs(String username, LocalDateTime startTime, 
-            LocalDateTime endTime) {
-        Criteria criteria = new Criteria("username").is(username)
-                .and("timestamp").between(startTime, endTime);
-        
-        SearchHits<OperationLog> searchHits = elasticsearchOperations.search(
-                new CriteriaQuery(criteria), OperationLog.class);
-        
-        return searchHits.stream()
-                .map(hit -> hit.getContent())
-                .collect(Collectors.toList());
-    }
-
-    public List<SystemLog> searchSystemLogs(String level, LocalDateTime startTime, 
-            LocalDateTime endTime) {
-        Criteria criteria = new Criteria("level").is(level)
-                .and("timestamp").between(startTime, endTime);
-        
-        SearchHits<SystemLog> searchHits = elasticsearchOperations.search(
-                new CriteriaQuery(criteria), SystemLog.class);
-        
-        return searchHits.stream()
-                .map(hit -> hit.getContent())
-                .collect(Collectors.toList());
-    }
-
-    public List<AuditLog> searchAuditLogs(String username, String entityType, 
-            LocalDateTime startTime, LocalDateTime endTime) {
-        Criteria criteria = new Criteria("username").is(username)
-                .and("entityType").is(entityType)
-                .and("timestamp").between(startTime, endTime);
-        
-        SearchHits<AuditLog> searchHits = elasticsearchOperations.search(
-                new CriteriaQuery(criteria), AuditLog.class);
-        
-        return searchHits.stream()
-                .map(hit -> hit.getContent())
-                .collect(Collectors.toList());
-    }
+    // 新增的日志分析方法
+    LogStatisticsDTO getLogStatistics(LocalDateTime start, LocalDateTime end);
+    List<LogTrendDTO> getLogTrends(LocalDateTime start, LocalDateTime end, String interval);
+    List<LogErrorDetailDTO> getErrorDetails(String type, LocalDateTime start, LocalDateTime end);
+    LogServiceHealthDTO getServiceHealth(String name, LocalDateTime start, LocalDateTime end);
 } 

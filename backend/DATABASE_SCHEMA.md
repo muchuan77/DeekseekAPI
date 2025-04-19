@@ -191,6 +191,10 @@ CREATE TABLE system_logs (
     level VARCHAR(20) NOT NULL,
     message TEXT NOT NULL,
     source VARCHAR(255),
+    application_name VARCHAR(100),
+    stack_trace TEXT,
+    response_time BIGINT,
+    log_time DATETIME NOT NULL,
     created_at DATETIME,
     updated_at DATETIME,
     created_by VARCHAR(50),
@@ -204,10 +208,12 @@ CREATE TABLE system_logs (
 CREATE TABLE operation_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
+    username VARCHAR(50) NOT NULL,
     operation_type VARCHAR(50) NOT NULL,
     target_type VARCHAR(50) NOT NULL,
     target_id BIGINT,
     details TEXT,
+    execution_time DATETIME NOT NULL,
     created_at DATETIME,
     updated_at DATETIME,
     created_by VARCHAR(50),
@@ -222,10 +228,12 @@ CREATE TABLE operation_logs (
 CREATE TABLE audit_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
+    username VARCHAR(50) NOT NULL,
     action VARCHAR(50) NOT NULL,
-    resource_type VARCHAR(50) NOT NULL,
-    resource_id BIGINT,
+    target_type VARCHAR(50) NOT NULL,
+    target_id BIGINT,
     details TEXT,
+    audit_time DATETIME NOT NULL,
     created_at DATETIME,
     updated_at DATETIME,
     created_by VARCHAR(50),
@@ -255,6 +263,8 @@ CREATE TABLE audit_logs (
    - 普通索引：created_at, level (system_logs)
    - 普通索引：user_id, operation_type (operation_logs)
    - 普通索引：user_id, action (audit_logs)
+   - 普通索引：application_name, log_time (system_logs)
+   - 普通索引：target_type, target_id (operation_logs, audit_logs)
 
 ## 注意事项
 

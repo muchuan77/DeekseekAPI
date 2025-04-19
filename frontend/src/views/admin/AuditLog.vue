@@ -80,16 +80,16 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import axios from 'axios'
+import { useLogStore } from '@/stores/log'
 import { format } from 'date-fns'
 
 export default {
   name: 'AuditLog',
   setup() {
+    const logStore = useLogStore()
     const loading = ref(false)
-    const logs = ref([])
     const currentPage = ref(1)
     const pageSize = ref(10)
     const total = ref(0)
@@ -103,18 +103,15 @@ export default {
     const fetchLogs = async () => {
       loading.value = true
       try {
-        const response = await axios.get('/api/logs/audit', {
-          params: {
-            page: currentPage.value - 1,
-            size: pageSize.value,
-            auditType: searchForm.auditType,
-            username: searchForm.username,
-            startDate: searchForm.dateRange?.[0],
-            endDate: searchForm.dateRange?.[1]
-          }
+        await logStore.fetchAuditLogs({
+          page: currentPage.value - 1,
+          size: pageSize.value,
+          auditType: searchForm.auditType,
+          username: searchForm.username,
+          startTime: searchForm.dateRange?.[0],
+          endTime: searchForm.dateRange?.[1]
         })
-        logs.value = response.data.data.content
-        total.value = response.data.data.totalElements
+        total.value = logStore.auditLogs.length
       } catch (error) {
         ElMessage.error('获取审计日志失败')
         console.error(error)
@@ -151,15 +148,15 @@ export default {
 
     const getAuditType = (type) => {
       switch (type) {
-        case 'AUTHENTICATION':
-          return 'primary'
-        case 'AUTHORIZATION':
-          return 'warning'
-        case 'DATA_ACCESS':
-          return 'info'
-        case 'CONFIG_CHANGE':
+        case 'LOGIN':
           return 'success'
-        case 'SECURITY_EVENT':
+        case 'LOGOUT':
+          return 'info'
+        case 'CREATE':
+          return 'primary'
+        case 'UPDATE':
+          return 'warning'
+        case 'DELETE':
           return 'danger'
         default:
           return ''
@@ -168,16 +165,16 @@ export default {
 
     const getAuditTypeText = (type) => {
       switch (type) {
-        case 'AUTHENTICATION':
-          return '认证'
-        case 'AUTHORIZATION':
-          return '授权'
-        case 'DATA_ACCESS':
-          return '数据访问'
-        case 'CONFIG_CHANGE':
-          return '配置变更'
-        case 'SECURITY_EVENT':
-          return '安全事件'
+        case 'LOGIN':
+          return '登录'
+        case 'LOGOUT':
+          return '登出'
+        case 'CREATE':
+          return '创建'
+        case 'UPDATE':
+          return '更新'
+        case 'DELETE':
+          return '删除'
         default:
           return type
       }
@@ -189,7 +186,7 @@ export default {
 
     return {
       loading,
-      logs,
+      logs: computed(() => logStore.auditLogs),
       currentPage,
       pageSize,
       total,

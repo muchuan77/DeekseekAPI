@@ -61,9 +61,9 @@ spring:
 
   elasticsearch:
     rest:
-      uris: http://${ELASTICSEARCH_HOST:localhost}:${ELASTICSEARCH_PORT:9200}
-      username: ${ELASTICSEARCH_USERNAME:ecat}
-      password: ${ELASTICSEARCH_PASSWORD:yxh258012}
+      uris: http://localhost:9200
+      username: elastic
+      password: yxh258012
     connection-timeout: 5000
     socket-timeout: 5000
 
@@ -83,9 +83,6 @@ logging:
     org.springframework.jdbc: DEBUG
   file:
     name: logs/application.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # 淇濇寔鏍煎紡
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"   # 淇濇寔鏍煎紡
 
 ai:
   service:
@@ -105,17 +102,22 @@ jwt:
   secret: ${JWT_SECRET:J8#kL9$mN2@pQ5*rT7&vX3!wY4^zB6}
   expiration: ${JWT_EXPIRATION:86400}
 
-# OpenAPI 閰嶇疆
+# OpenAPI
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
   api-docs:
     path: /v3/api-docs
+    enabled: true
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
   packages-to-scan: com.rumor.tracing.controller
   paths-to-match: /api/**
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/api/**'
+      packages-to-scan: com.rumor.tracing.controller
 
 management:
   endpoints:

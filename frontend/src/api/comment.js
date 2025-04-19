@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function createComment(data) {
   return request({
-    url: '/comments',
+    url: '/api/comments',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function createComment(data) {
 
 export function getComments(params) {
   return request({
-    url: '/comments',
+    url: '/api/comments',
     method: 'get',
     params
   })
@@ -18,7 +18,7 @@ export function getComments(params) {
 
 export function deleteComment(id) {
   return request({
-    url: `/comments/${id}`,
+    url: `/api/comments/${id}`,
     method: 'delete'
   })
 } 

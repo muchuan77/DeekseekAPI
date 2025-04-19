@@ -126,7 +126,7 @@ export const userApi = {
   // 批量删除用户
   batchDelete(userIds) {
     return request({
-      url: '/users/batch-delete',
+      url: '/api/users/batch-delete',
       method: 'post',
       data: { userIds }
     }).then(response => {
@@ -140,7 +140,7 @@ export const userApi = {
   // 批量更新用户状态
   batchUpdateStatus(userIds, status) {
     return request({
-      url: '/users/batch-update-status',
+      url: '/api/users/batch-update-status',
       method: 'post',
       data: { userIds, status }
     }).then(response => {
@@ -154,7 +154,7 @@ export const userApi = {
   // 导出用户
   exportUsers() {
     return request({
-      url: '/users/export',
+      url: '/api/users/export',
       method: 'get',
       responseType: 'blob'
     }).then(response => {
@@ -173,7 +173,7 @@ export const userApi = {
     const formData = new FormData()
     formData.append('file', file)
     return request({
-      url: '/users/import',
+      url: '/api/users/import',
       method: 'post',
       data: formData,
       headers: {

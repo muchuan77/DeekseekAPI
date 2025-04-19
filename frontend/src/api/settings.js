@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取系统设置
 export function getSettings() {
   return request({
-    url: '/settings',
+    url: '/api/settings',
     method: 'get'
   })
 }
@@ -11,7 +11,7 @@ export function getSettings() {
 // 更新系统设置
 export function updateSettings(data) {
   return request({
-    url: '/settings',
+    url: '/api/settings',
     method: 'put',
     data
   })
@@ -20,7 +20,7 @@ export function updateSettings(data) {
 // 获取系统状态
 export function getSystemStatus() {
   return request({
-    url: '/settings/status',
+    url: '/api/settings/status',
     method: 'get'
   })
 }
@@ -28,7 +28,7 @@ export function getSystemStatus() {
 // 重置系统设置
 export function resetSettings() {
   return request({
-    url: '/settings/reset',
+    url: '/api/settings/reset',
     method: 'post'
   })
 } 

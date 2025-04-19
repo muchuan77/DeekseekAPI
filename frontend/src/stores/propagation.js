@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { propagationApi } from '@/api/propagation'
+import * as propagationApi from '@/api/propagation'
 import { ElMessage } from 'element-plus'
 
 export const usePropagationStore = defineStore('propagation', {
@@ -7,7 +7,12 @@ export const usePropagationStore = defineStore('propagation', {
     propagationData: [],
     analysisResults: {},
     loading: false,
-    totalData: 0
+    totalData: 0,
+    traceData: [], // 传播路径数据
+    nodes: [], // 图表节点数据
+    edges: [], // 图表边数据
+    total: 0, // 总数据量
+    error: null
   }),
 
   getters: {
@@ -80,6 +85,98 @@ export const usePropagationStore = defineStore('propagation', {
       } finally {
         this.loading = false
       }
+    },
+
+    // 获取传播路径数据
+    async fetchTraceData(params) {
+      try {
+        this.loading = true
+        this.error = null
+        
+        const response = await propagationApi.getPropagationPaths(params.rumorId, {
+          startDate: params.startDate,
+          endDate: params.endDate,
+          page: params.page,
+          pageSize: params.pageSize
+        })
+        
+        if (response.code === 200) {
+          this.traceData = response.data.content || []
+          this.total = response.data.totalElements || 0
+          this.processChartData(response.data.content)
+        } else {
+          throw new Error(response.message || '获取传播路径数据失败')
+        }
+      } catch (error) {
+        this.error = error
+        console.error('获取传播路径数据失败:', error)
+        ElMessage.error(error.message || '获取传播路径数据失败')
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // 处理图表数据
+    processChartData(data) {
+      if (!data || !Array.isArray(data)) {
+        this.nodes = []
+        this.edges = []
+        return
+      }
+      
+      try {
+        const nodeMap = new Map()
+        const edges = []
+        
+        data.forEach(item => {
+          // 处理源节点
+          if (!nodeMap.has(item.source)) {
+            nodeMap.set(item.source, {
+              id: item.source,
+              name: item.source,
+              symbolSize: 30
+            })
+          }
+          
+          // 处理目标节点
+          if (!nodeMap.has(item.target)) {
+            nodeMap.set(item.target, {
+              id: item.target,
+              name: item.target,
+              symbolSize: 30
+            })
+          }
+          
+          // 添加边
+          edges.push({
+            source: item.source,
+            target: item.target,
+            label: {
+              show: true,
+              formatter: getTypeText(item.type)
+            }
+          })
+        })
+        
+        this.nodes = Array.from(nodeMap.values())
+        this.edges = edges
+      } catch (error) {
+        console.error('处理图表数据失败:', error)
+        this.nodes = []
+        this.edges = []
+      }
     }
   }
-}) 
+})
+
+// 获取类型文本
+function getTypeText(type) {
+  const texts = {
+    'forward': '转发',
+    'comment': '评论',
+    'like': '点赞',
+    'report': '举报'
+  }
+  return texts[type] || '未知'
+} 

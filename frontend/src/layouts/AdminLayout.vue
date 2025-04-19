@@ -23,7 +23,7 @@
         </el-menu-item>
         <el-menu-item v-if="hasRole('ADMIN')" index="/admin/user-roles">
           <el-icon><el-icon-user /></el-icon>
-          <span>用户角色</span>
+          <span>用户角色管理</span>
         </el-menu-item>
         <el-menu-item v-if="hasRole('ADMIN') || hasRole('MODERATOR')" index="/admin/comments">
           <el-icon><el-icon-chat-dot-round /></el-icon>
@@ -34,6 +34,10 @@
             <el-icon><el-icon-document-copy /></el-icon>
             <span>日志管理</span>
           </template>
+          <el-menu-item index="/admin/logs">
+            <el-icon><el-icon-document-copy /></el-icon>
+            <span>日志管理</span>
+          </el-menu-item>
           <el-menu-item index="/admin/system-logs">
             <el-icon><el-icon-monitor /></el-icon>
             <span>系统日志</span>

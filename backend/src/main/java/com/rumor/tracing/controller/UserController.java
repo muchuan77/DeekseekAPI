@@ -8,7 +8,6 @@ import com.rumor.tracing.dto.response.PageResponse;
 import com.rumor.tracing.dto.response.UserResponse;
 import com.rumor.tracing.entity.User;
 import com.rumor.tracing.entity.User.UserStatus;
-import com.rumor.tracing.repository.UserRepository;
 import com.rumor.tracing.security.annotation.RequiresAdmin;
 import com.rumor.tracing.security.annotation.RequiresModerator;
 import com.rumor.tracing.security.annotation.RequiresUser;
@@ -46,7 +45,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OperationLogService operationLogService;
 
