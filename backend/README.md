@@ -12,6 +12,9 @@
 - 软删除支持：所有实体支持软删除
 - 乐观锁支持：所有实体支持乐观锁
 - 审计日志：记录所有关键操作
+- 分布式缓存：使用Redis进行缓存管理
+- 全文搜索：使用Elasticsearch进行高效检索
+- 多环境配置：支持开发、测试、生产环境配置
 
 ## 技术架构
 
@@ -34,9 +37,11 @@
 - Redis：缓存服务
   - 会话管理
   - 热点数据缓存
+  - 分布式锁
 - Elasticsearch：全文搜索
   - 谣言内容索引
   - 快速检索
+  - 聚合分析
 
 ### AI服务集成
 - DeepSeek API
@@ -44,28 +49,29 @@
   - 图像识别
   - 视频分析
   - 多模态融合
+  - 情感分析
+  - 可信度评估
 
 ### 开发工具
 - Lombok：简化代码
 - MapStruct：对象映射
 - Maven：依赖管理
 - Swagger：API文档
-- JaCoCo：代码覆盖率
-- Checkstyle：代码规范检查
-- SpotBugs：代码缺陷检测
+- Git：版本控制
 
 ## 系统要求
 
 ### 开发环境
 - JDK 18+
 - Maven 3.8+
-- Docker 20.10+
-- Docker Compose 2.0+
+- Git 2.30+
+- IDE (推荐使用IntelliJ IDEA)
 
 ### 运行环境
 - MySQL 8.0+
 - Redis 6.x+
 - Elasticsearch 7.17.4+
+- 操作系统：Linux/Windows/macOS
 
 ## 快速开始
 
@@ -83,6 +89,14 @@ spring:
     host: localhost
     port: 6379
     password: your_password
+    database: 0
+    timeout: 10000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1
 ```
 
 #### Elasticsearch配置
@@ -93,6 +107,8 @@ spring:
       uris: http://localhost:9200
       username: elastic
       password: your_password
+    connection-timeout: 5000
+    socket-timeout: 5000
 ```
 
 ### 2. 编译项目
@@ -119,58 +135,58 @@ java -jar target/rumor-tracing-1.0.0.jar
 src/main/java/com/rumor/tracing/
 ├── config/          # 配置类
 │   ├── SecurityConfig.java
-│   ├── SwaggerConfig.java
+│   ├── OpenApiConfig.java
 │   ├── MessageConfig.java
-│   ├── LoggingConfig.java
-│   ├── AIConfig.java
-│   └── JpaConfig.java
+│   ├── LogConfig.java
+│   ├── LogSecurityConfig.java
+│   ├── LogElasticsearchConfig.java
+│   ├── JpaConfig.java
+│   └── RestTemplateConfig.java
 ├── controller/      # 控制器层
 │   ├── AuthController.java
 │   ├── UserController.java
 │   ├── RumorController.java
 │   ├── CommentController.java
-│   ├── AnalyticsController.java
+│   ├── DeepSeekAnalysisController.java
 │   ├── LogController.java
 │   ├── PermissionController.java
+│   ├── PropagationController.java
 │   └── SystemController.java
 ├── service/         # 服务层
 │   ├── impl/
 │   │   ├── UserServiceImpl.java
 │   │   ├── RumorServiceImpl.java
 │   │   ├── OperationLogServiceImpl.java
-│   │   └── PropagationAnalysisServiceImpl.java
+│   │   ├── PropagationAnalysisServiceImpl.java
+│   │   └── DeepSeekAIServiceImpl.java
 │   ├── AuthService.java
 │   ├── UserService.java
 │   ├── RumorService.java
 │   ├── CommentService.java
-│   ├── AnalyticsService.java
+│   ├── DeepSeekAIService.java
 │   ├── OperationLogService.java
 │   ├── PropagationAnalysisService.java
-│   └── LoggingService.java
+│   ├── LoggingService.java
+│   ├── PermissionService.java
+│   └── SystemService.java
 ├── repository/      # 数据访问层
 ├── entity/         # 实体类
 │   ├── User.java
 │   ├── Rumor.java
 │   ├── Comment.java
-│   ├── OperationLog.java
+│   ├── LogOperation.java
+│   ├── LogAudit.java
+│   ├── LogSystem.java
 │   ├── RumorAnalysis.java
+│   ├── DeepSeekAnalysis.java
+│   ├── PropagationPath.java
 │   ├── InfluenceAnalysis.java
-│   ├── MisinformationIndicator.java
-│   ├── FactCheckingPoint.java
-│   ├── AIAnalysis.java
-│   ├── AuditLog.java
-│   ├── SystemLog.java
-│   ├── UserRole.java
 │   └── BaseEntity.java
 ├── dto/            # 数据传输对象
 ├── exception/      # 异常处理
 ├── security/       # 安全相关
-├── ai/            # AI服务相关
-│   ├── dto/
-│   └── service/
-├── aspect/        # AOP切面
-├── annotation/    # 自定义注解
-└── util/          # 工具类
+├── model/          # 数据模型
+└── RumorTracingApplication.java
 ```
 
 ## 核心功能实现
@@ -189,63 +205,65 @@ src/main/java/com/rumor/tracing/
   - @RequiresAdmin
   - @RequiresModerator
   - @RequiresUser
+  - @RequiresPermission
 
 ### 2. 谣言检测服务
 - 文本分析
   - 关键词提取
   - 情感分析
   - 可信度评估
+  - 语义分析
+  - 实体识别
 - 图像识别
   - 图像内容分析
   - 图像篡改检测
+  - OCR文字识别
+  - 图像相似度分析
 - 视频分析
   - 视频内容识别
   - 关键帧提取
+  - 视频摘要生成
+  - 视频相似度分析
 - 多模态融合
   - 特征融合
   - 决策融合
+  - 跨模态检索
+  - 多模态分类
 
 ### 3. 传播追踪服务
 - 传播路径分析
   - 传播网络构建
   - 关键节点识别
   - 传播路径可视化
+  - 传播速度分析
+  - 传播范围分析
 - 影响力评估
   - 用户影响力计算
   - 内容传播力评估
   - 传播路径分析
+  - 影响力预测
 - 实时监控
   - 传播趋势分析
   - 异常传播检测
   - 传播路径追踪
+  - 实时告警
 
 ### 4. 日志管理服务
 - 操作日志
   - 用户操作记录
   - 系统操作记录
   - 审计日志
+  - 性能日志
 - 系统日志
   - 错误日志
   - 性能日志
   - 安全日志
+  - 访问日志
 - 日志分析
   - 日志聚合
   - 异常检测
   - 性能分析
-
-### 5. AI分析服务
-- 多模态分析
-  - 文本分析
-  - 图像识别
-  - 视频分析
-- 智能检测
-  - 谣言识别
-  - 情感分析
-  - 可信度评估
-- 分析结果
-  - 分析报告
-  - 指标统计
-  - 趋势预测
+  - 安全分析
 
 ## API文档
 
@@ -254,76 +272,6 @@ src/main/java/com/rumor/tracing/
 - Swagger UI：`http://localhost:8080/swagger-ui.html`
 - OpenAPI规范：`http://localhost:8080/v3/api-docs`
 
-## 测试
-
-### 单元测试
-```bash
-# 运行所有测试
-mvn test
-
-# 运行特定测试类
-mvn test -Dtest=YourTestClass
-```
-
-### 集成测试
-```bash
-# 运行集成测试
-mvn verify -Pintegration-test
-```
-
-### 测试覆盖率
-```bash
-# 生成测试覆盖率报告
-mvn test jacoco:report
-```
-
-## 部署
-
-### Docker部署
-```bash
-# 构建镜像
-docker build -t rumor-tracing-backend .
-
-# 运行容器
-docker run -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/rumor_tracing \
-  -e SPRING_REDIS_HOST=redis \
-  -e SPRING_ELASTICSEARCH_REST_URIS=http://elasticsearch:9200 \
-  rumor-tracing-backend
-```
-
-### Kubernetes部署
-```bash
-# 部署应用
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-
-# 查看部署状态
-kubectl get pods
-kubectl get services
-```
-
-## 监控与日志
-
-### 日志配置
-```yaml
-logging:
-  level:
-    root: INFO
-    com.rumor.tracing: DEBUG
-  file:
-    name: logs/application.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-```
-
-### 监控指标
-- JVM监控
-- 数据库监控
-- API性能监控
-- 系统资源监控
-
 ## 开发规范
 
 ### 代码规范
@@ -331,18 +279,23 @@ logging:
 - 使用Lombok简化代码
 - 使用MapStruct进行对象映射
 - 提交信息遵循Angular提交规范
+- 代码注释规范
+- 命名规范
+- 异常处理规范
 
 ### 分支管理
 - main：主分支
 - develop：开发分支
 - feature/*：功能分支
 - hotfix/*：修复分支
+- release/*：发布分支
 
 ### 版本管理
 - 遵循语义化版本
 - 主版本号：重大更新
 - 次版本号：功能更新
 - 修订号：问题修复
+- 预发布版本：alpha/beta/rc
 
 ## 常见问题
 
@@ -350,11 +303,22 @@ logging:
 1. 检查MySQL服务状态
 2. 验证数据库连接信息
 3. 检查网络连接
+4. 检查连接池配置
+5. 检查数据库权限
 
 ### Redis连接问题
 1. 检查Redis服务状态
 2. 验证Redis配置
 3. 检查防火墙设置
+4. 检查网络连接
+5. 检查Redis版本兼容性
+
+### Elasticsearch连接问题
+1. 检查Elasticsearch服务状态
+2. 验证Elasticsearch配置
+3. 检查网络连接
+4. 检查索引状态
+5. 检查集群健康状态
 
 ## 贡献指南
 
@@ -362,6 +326,8 @@ logging:
 2. 创建功能分支
 3. 提交代码
 4. 发起Pull Request
+5. 等待审核
+6. 合并代码
 
 ## 许可证
 

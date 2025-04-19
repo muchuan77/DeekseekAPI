@@ -1346,6 +1346,217 @@ API层根据功能分为不同的模块：
 }
 ```
 
+### DeepSeek分析模块 (`DeepSeekAnalysisController.java`)
+AI分析相关操作：
+
+#### 文本分析
+- 路径: `/api/deepseek/analyze/text`
+- 方法: POST
+- 描述: 对文本内容进行分析
+- 请求体:
+```json
+{
+  "content": "string",
+  "type": "TEXT"
+}
+```
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "sentiment": "string",
+    "keywords": ["string"],
+    "entities": ["string"],
+    "confidence": "number"
+  }
+}
+```
+
+#### 图像分析
+- 路径: `/api/deepseek/analyze/image`
+- 方法: POST
+- 描述: 对图像内容进行分析
+- 请求体:
+```json
+{
+  "content": "string",
+  "type": "IMAGE"
+}
+```
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "objects": ["string"],
+    "text": "string",
+    "confidence": "number"
+  }
+}
+```
+
+#### 视频分析
+- 路径: `/api/deepseek/analyze/video`
+- 方法: POST
+- 描述: 对视频内容进行分析
+- 请求体:
+```json
+{
+  "content": "string",
+  "type": "VIDEO"
+}
+```
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "scenes": ["string"],
+    "objects": ["string"],
+    "confidence": "number"
+  }
+}
+```
+
+#### 多模态分析
+- 路径: `/api/deepseek/analyze/multimodal`
+- 方法: POST
+- 描述: 对多模态内容进行分析
+- 请求体:
+```json
+{
+  "content": "string",
+  "type": "MULTIMODAL"
+}
+```
+- 响应:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "analysis": "string",
+    "confidence": "number",
+    "details": "object"
+  }
+}
+```
+
+### 传播分析模块 (`PropagationController.java`)
+传播分析相关操作：
+
+#### 获取传播路径
+- 路径: `/api/propagation/paths/{rumorId}`
+- 方法: GET
+- 描述: 获取谣言的传播路径
+- 查询参数:
+  - startDate: 开始日期 (yyyy-MM-dd)
+  - endDate: 结束日期 (yyyy-MM-dd)
+  - page: 页码（默认0）
+  - size: 每页大小（默认10）
+- 响应:
+```json
+{
+  "code": 200,
+  "data": {
+    "content": [
+      {
+        "id": "number",
+        "rumorId": "number",
+        "path": ["string"],
+        "pathLength": "number",
+        "createdAt": "string"
+      }
+    ],
+    "totalElements": "number",
+    "totalPages": "number"
+  }
+}
+```
+
+#### 获取影响力分析
+- 路径: `/api/propagation/influence/{rumorId}`
+- 方法: GET
+- 描述: 获取谣言的影响力分析
+- 响应:
+```json
+{
+  "analysis": {
+    "influenceScore": "number",
+    "reach": "number",
+    "engagement": "number",
+    "virality": "number"
+  }
+}
+```
+
+#### 获取传播趋势
+- 路径: `/api/propagation/trends/{rumorId}`
+- 方法: GET
+- 描述: 获取谣言的传播趋势
+- 查询参数:
+  - type: 时间类型 (hour/day/week/month)
+- 响应:
+```json
+{
+  "code": 200,
+  "data": [
+    {
+      "timestamp": "string",
+      "count": "number",
+      "type": "string"
+    }
+  ]
+}
+```
+
+#### 获取关键节点
+- 路径: `/api/propagation/key-nodes/{rumorId}`
+- 方法: GET
+- 描述: 获取传播网络中的关键节点
+- 响应:
+```json
+{
+  "keyNodes": [
+    {
+      "nodeId": "string",
+      "influence": "number",
+      "pathCount": "number"
+    }
+  ]
+}
+```
+
+#### 获取传播统计
+- 路径: `/api/propagation/statistics/{rumorId}`
+- 方法: GET
+- 描述: 获取谣言的传播统计数据
+- 响应:
+```json
+{
+  "totalPaths": "number",
+  "averagePathLength": "number",
+  "maxPathLength": "number"
+}
+```
+
+#### 获取传播网络
+- 路径: `/api/propagation/network/{rumorId}`
+- 方法: GET
+- 描述: 获取谣言的传播网络
+- 响应:
+```json
+{
+  "nodes": ["string"],
+  "edges": ["string"],
+  "statistics": "object"
+}
+```
+
 ## 错误码说明
 
 | 错误码 | 说明 |

@@ -30,7 +30,11 @@ CREATE TABLE users (
     updated_at DATETIME,
     created_by VARCHAR(50),
     updated_by VARCHAR(50),
-    version INT DEFAULT 0
+    version INT DEFAULT 0,
+    INDEX idx_username (username),
+    INDEX idx_email (email),
+    INDEX idx_status (status),
+    INDEX idx_enabled (enabled)
 );
 ```
 
@@ -39,8 +43,9 @@ CREATE TABLE users (
 CREATE TABLE user_roles (
     user_id BIGINT NOT NULL,
     role VARCHAR(50) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    PRIMARY KEY (user_id, role)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, role),
+    INDEX idx_role (role)
 );
 ```
 
@@ -63,7 +68,12 @@ CREATE TABLE rumors (
     updated_at DATETIME,
     created_by VARCHAR(50),
     updated_by VARCHAR(50),
-    version INT DEFAULT 0
+    version INT DEFAULT 0,
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at),
+    INDEX idx_verified (verified),
+    INDEX idx_deleted (deleted),
+    FOREIGN KEY (verified_by) REFERENCES users(id)
 );
 ```
 
@@ -74,17 +84,103 @@ CREATE TABLE comments (
     rumor_id BIGINT NOT NULL,
     content TEXT NOT NULL,
     user_id BIGINT NOT NULL,
+    parent_id BIGINT,
     created_at DATETIME,
     updated_at DATETIME,
     created_by VARCHAR(50),
     updated_by VARCHAR(50),
     version INT DEFAULT 0,
-    FOREIGN KEY (rumor_id) REFERENCES rumors(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (rumor_id) REFERENCES rumors(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE,
+    INDEX idx_rumor_id (rumor_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_parent_id (parent_id)
 );
 ```
 
-### 5. 谣言分析表 (rumor_analysis)
+### 5. DeepSeek分析表 (deepseek_analysis)
+```sql
+CREATE TABLE deepseek_analysis (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    rumor_id BIGINT NOT NULL,
+    analysis_type VARCHAR(50) NOT NULL,
+    result TEXT,
+    confidence DOUBLE,
+    created_at DATETIME,
+    updated_at DATETIME,
+    FOREIGN KEY (rumor_id) REFERENCES rumors(id) ON DELETE CASCADE,
+    INDEX idx_rumor_id (rumor_id),
+    INDEX idx_analysis_type (analysis_type)
+);
+```
+
+### 6. 传播路径表 (propagation_paths)
+```sql
+CREATE TABLE propagation_paths (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    rumor_id BIGINT NOT NULL,
+    source_node VARCHAR(255) NOT NULL,
+    target_node VARCHAR(255) NOT NULL,
+    propagation_time BIGINT NOT NULL,
+    path_length INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    created_at DATETIME,
+    updated_at DATETIME,
+    created_by VARCHAR(50),
+    updated_by VARCHAR(50),
+    version INT DEFAULT 0,
+    FOREIGN KEY (rumor_id) REFERENCES rumors(id) ON DELETE CASCADE,
+    INDEX idx_rumor_id (rumor_id),
+    INDEX idx_source_node (source_node),
+    INDEX idx_target_node (target_node),
+    INDEX idx_type (type)
+);
+```
+
+### 7. 影响力分析表 (influence_analysis)
+```sql
+CREATE TABLE influence_analysis (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    rumor_id BIGINT NOT NULL,
+    node_id VARCHAR(255) NOT NULL,
+    influence_score DOUBLE NOT NULL,
+    path_count INT NOT NULL,
+    is_key_node BOOLEAN NOT NULL,
+    analysis_time BIGINT NOT NULL,
+    user_count INT NOT NULL,
+    content_count INT NOT NULL,
+    analysis_time_original DATETIME NOT NULL,
+    analysis_status VARCHAR(50) NOT NULL,
+    analysis_result TEXT,
+    created_at DATETIME,
+    updated_at DATETIME,
+    created_by VARCHAR(50),
+    updated_by VARCHAR(50),
+    version INT DEFAULT 0,
+    FOREIGN KEY (rumor_id) REFERENCES rumors(id) ON DELETE CASCADE,
+    INDEX idx_rumor_id (rumor_id),
+    INDEX idx_node_id (node_id),
+    INDEX idx_analysis_time (analysis_time),
+    INDEX idx_is_key_node (is_key_node)
+);
+
+CREATE TABLE influence_analysis_user_influence (
+    analysis_id BIGINT NOT NULL,
+    user_influence VARCHAR(255),
+    FOREIGN KEY (analysis_id) REFERENCES influence_analysis(id) ON DELETE CASCADE,
+    INDEX idx_analysis_id (analysis_id)
+);
+
+CREATE TABLE influence_analysis_content_influence (
+    analysis_id BIGINT NOT NULL,
+    content_influence VARCHAR(255),
+    FOREIGN KEY (analysis_id) REFERENCES influence_analysis(id) ON DELETE CASCADE,
+    INDEX idx_analysis_id (analysis_id)
+);
+```
+
+### 8. 谣言分析表 (rumor_analysis)
 ```sql
 CREATE TABLE rumor_analysis (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -97,94 +193,15 @@ CREATE TABLE rumor_analysis (
     created_by VARCHAR(50),
     updated_by VARCHAR(50),
     version INT DEFAULT 0,
-    FOREIGN KEY (rumor_id) REFERENCES rumors(id)
-);
-```
-
-### 6. 传播路径表 (propagation_paths)
-```sql
-CREATE TABLE propagation_paths (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    rumor_id BIGINT NOT NULL,
-    source VARCHAR(255),
-    target VARCHAR(255),
-    path_type VARCHAR(50),
-    created_at DATETIME,
-    updated_at DATETIME,
-    created_by VARCHAR(50),
-    updated_by VARCHAR(50),
-    version INT DEFAULT 0,
-    FOREIGN KEY (rumor_id) REFERENCES rumors(id)
-);
-```
-
-### 7. 影响分析表 (influence_analysis)
-```sql
-CREATE TABLE influence_analysis (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    rumor_id BIGINT NOT NULL,
-    analysis_type VARCHAR(50) NOT NULL,
-    metrics JSON,
-    created_at DATETIME,
-    updated_at DATETIME,
-    created_by VARCHAR(50),
-    updated_by VARCHAR(50),
-    version INT DEFAULT 0,
-    FOREIGN KEY (rumor_id) REFERENCES rumors(id)
-);
-```
-
-### 8. 虚假信息指标表 (misinformation_indicators)
-```sql
-CREATE TABLE misinformation_indicators (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    rumor_id BIGINT NOT NULL,
-    indicator_type VARCHAR(50) NOT NULL,
-    score FLOAT,
-    created_at DATETIME,
-    updated_at DATETIME,
-    created_by VARCHAR(50),
-    updated_by VARCHAR(50),
-    version INT DEFAULT 0,
-    FOREIGN KEY (rumor_id) REFERENCES rumors(id)
-);
-```
-
-### 9. 事实核查点表 (fact_checking_points)
-```sql
-CREATE TABLE fact_checking_points (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    rumor_id BIGINT NOT NULL,
-    point_type VARCHAR(50) NOT NULL,
-    content TEXT,
-    created_at DATETIME,
-    updated_at DATETIME,
-    created_by VARCHAR(50),
-    updated_by VARCHAR(50),
-    version INT DEFAULT 0,
-    FOREIGN KEY (rumor_id) REFERENCES rumors(id)
-);
-```
-
-### 10. AI分析表 (ai_analysis)
-```sql
-CREATE TABLE ai_analysis (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    rumor_id BIGINT NOT NULL,
-    analysis_type VARCHAR(50) NOT NULL,
-    result TEXT,
-    created_at DATETIME,
-    updated_at DATETIME,
-    created_by VARCHAR(50),
-    updated_by VARCHAR(50),
-    version INT DEFAULT 0,
-    FOREIGN KEY (rumor_id) REFERENCES rumors(id)
+    FOREIGN KEY (rumor_id) REFERENCES rumors(id) ON DELETE CASCADE,
+    INDEX idx_rumor_id (rumor_id),
+    INDEX idx_analysis_type (analysis_type)
 );
 ```
 
 ## 日志相关表
 
-### 11. 系统日志表 (system_logs)
+### 9. 系统日志表 (system_logs)
 ```sql
 CREATE TABLE system_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -199,11 +216,14 @@ CREATE TABLE system_logs (
     updated_at DATETIME,
     created_by VARCHAR(50),
     updated_by VARCHAR(50),
-    version INT DEFAULT 0
+    version INT DEFAULT 0,
+    INDEX idx_level (level),
+    INDEX idx_log_time (log_time),
+    INDEX idx_application_name (application_name)
 );
 ```
 
-### 12. 操作日志表 (operation_logs)
+### 10. 操作日志表 (operation_logs)
 ```sql
 CREATE TABLE operation_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -219,11 +239,15 @@ CREATE TABLE operation_logs (
     created_by VARCHAR(50),
     updated_by VARCHAR(50),
     version INT DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_operation_type (operation_type),
+    INDEX idx_target_type (target_type),
+    INDEX idx_target_id (target_id)
 );
 ```
 
-### 13. 审计日志表 (audit_logs)
+### 11. 审计日志表 (audit_logs)
 ```sql
 CREATE TABLE audit_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -239,7 +263,11 @@ CREATE TABLE audit_logs (
     created_by VARCHAR(50),
     updated_by VARCHAR(50),
     version INT DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_action (action),
+    INDEX idx_target_type (target_type),
+    INDEX idx_target_id (target_id)
 );
 ```
 
@@ -252,13 +280,31 @@ CREATE TABLE audit_logs (
 
 2. 谣言表索引：
    - 主键索引：id
-   - 普通索引：status, created_at
+   - 普通索引：status, created_at, verified, deleted
+   - 外键索引：verified_by
 
 3. 评论表索引：
    - 主键索引：id
-   - 外键索引：rumor_id, user_id
+   - 外键索引：rumor_id, user_id, parent_id
+   - 普通索引：created_at
 
-4. 日志表索引：
+4. DeepSeek分析表索引：
+   - 主键索引：id
+   - 外键索引：rumor_id
+   - 普通索引：analysis_type
+
+5. 传播路径表索引：
+   - 主键索引：id
+   - 外键索引：rumor_id
+   - 普通索引：source_node, target_node, type
+
+6. 影响力分析表索引：
+   - 主键索引：id
+   - 外键索引：rumor_id
+   - 普通索引：node_id, analysis_time, is_key_node
+   - 关联表索引：analysis_id
+
+7. 日志表索引：
    - 主键索引：id
    - 普通索引：created_at, level (system_logs)
    - 普通索引：user_id, operation_type (operation_logs)
@@ -275,4 +321,11 @@ CREATE TABLE audit_logs (
 5. 大文本字段使用 TEXT 类型
 6. 数值类型根据实际需求选择 INT 或 BIGINT
 7. 所有表都包含 version 字段用于乐观锁
-8. 软删除使用 deleted 字段标记 
+8. 软删除使用 deleted 字段标记
+9. 所有表都添加了适当的索引以提高查询性能
+10. JSON 类型字段用于存储复杂的数据结构
+11. 所有外键都添加了索引以提高关联查询性能
+12. 时间戳字段都添加了索引以支持时间范围查询
+13. 影响力分析表使用关联表存储多值字段
+14. 传播路径表使用 BIGINT 存储时间戳
+15. 分析结果使用 TEXT 类型存储，支持大文本内容 
