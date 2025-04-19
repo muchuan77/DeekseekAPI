@@ -2,15 +2,10 @@ import request from '@/utils/request'
 
 export const userApi = {
   // 获取当前用户信息
-  getUserInfo() {
+  getCurrentUser() {
     return request({
       url: '/api/users/me',
       method: 'get'
-    }).then(response => {
-      if (response.code === 200) {
-        return response.data
-      }
-      throw new Error(response.message)
     })
   },
 
@@ -84,11 +79,11 @@ export const userApi = {
   },
 
   // 修改密码
-  changePassword(id, oldPassword, newPassword) {
+  changePassword(id, data) {
     return request({
       url: `/api/users/${id}/change-password`,
       method: 'post',
-      params: { oldPassword, newPassword }
+      data
     })
   },
 
@@ -97,8 +92,7 @@ export const userApi = {
     return request({
       url: '/api/users/batch/status',
       method: 'post',
-      data: ids,
-      params: { status }
+      data: { ids, status }
     })
   },
 

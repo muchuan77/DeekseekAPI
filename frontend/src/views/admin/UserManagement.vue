@@ -206,15 +206,15 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { userApi } from '@/api/user'
-import { getUserRoles, updateUserRoles } from '@/api/permission'
+import { useUserStore } from '@/stores/user'
 
-const loading = ref(false)
-const submitting = ref(false)
-const users = ref([])
+const userStore = useUserStore()
+const loading = computed(() => userStore.loading)
+const users = computed(() => userStore.userList)
+const total = computed(() => userStore.totalUsers)
+
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(0)
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const formRef = ref(null)
@@ -261,20 +261,15 @@ const rules = {
 }
 
 const fetchUsers = async () => {
-  loading.value = true
   try {
-    const response = await userApi.getUsers({
+    await userStore.fetchUserList({
       page: currentPage.value - 1,
       size: pageSize.value,
       keyword: searchForm.keyword,
       status: searchForm.status
     })
-    users.value = response.content
-    total.value = response.totalElements
   } catch (error) {
     ElMessage.error('获取用户列表失败')
-  } finally {
-    loading.value = false
   }
 }
 
@@ -324,7 +319,7 @@ const handleDelete = async (row) => {
     await ElMessageBox.confirm('确定要删除该用户吗？', '提示', {
       type: 'warning'
     })
-    await userApi.deleteUser(row.id)
+    await userStore.deleteUser(row.id)
     ElMessage.success('删除成功')
     fetchUsers()
   } catch (error) {
@@ -341,7 +336,7 @@ const handleResetPassword = (row) => {
 
 const confirmResetPassword = async () => {
   try {
-    await userApi.resetPassword(selectedUser.value.id)
+    await userStore.resetPassword(selectedUser.value.id)
     ElMessage.success('密码重置成功')
     resetPasswordDialogVisible.value = false
   } catch (error) {
@@ -354,15 +349,14 @@ const handleSubmit = async () => {
   
   try {
     await formRef.value.validate()
-    submitting.value = true
     
     if (form.id) {
       // 编辑用户
-      await userApi.updateUser(form.id, form)
+      await userStore.updateUser(form.id, form)
       ElMessage.success('更新成功')
     } else {
       // 添加用户
-      await userApi.createUser(form)
+      await userStore.createUser(form)
       ElMessage.success('添加成功')
     }
     
@@ -370,8 +364,6 @@ const handleSubmit = async () => {
     fetchUsers()
   } catch (error) {
     ElMessage.error(error.message || '操作失败')
-  } finally {
-    submitting.value = false
   }
 }
 
@@ -392,7 +384,7 @@ const handleSelectionChange = (selection) => {
 // 批量启用
 const handleBatchEnable = async () => {
   try {
-    await userApi.batchUpdateStatus(
+    await userStore.batchUpdateStatus(
       selectedUsers.value.map(user => user.id),
       'ENABLED'
     )
@@ -406,7 +398,7 @@ const handleBatchEnable = async () => {
 // 批量禁用
 const handleBatchDisable = async () => {
   try {
-    await userApi.batchUpdateStatus(
+    await userStore.batchUpdateStatus(
       selectedUsers.value.map(user => user.id),
       'DISABLED'
     )
@@ -425,7 +417,7 @@ const handleBatchDelete = () => {
 // 确认批量删除
 const confirmBatchDelete = async () => {
   try {
-    await userApi.batchDelete(selectedUsers.value.map(user => user.id))
+    await userStore.batchDelete(selectedUsers.value.map(user => user.id))
     ElMessage.success('批量删除成功')
     batchDeleteDialogVisible.value = false
     fetchUsers()
@@ -437,17 +429,10 @@ const confirmBatchDelete = async () => {
 // 导出用户
 const handleExport = async () => {
   try {
-    const response = await userApi.exportUsers({
+    await userStore.exportUsers({
       keyword: searchForm.keyword,
       status: searchForm.status
     })
-    const url = window.URL.createObjectURL(new Blob([response]))
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `users_${new Date().getTime()}.xlsx`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
   } catch (error) {
     ElMessage.error('导出失败')
   }
@@ -475,7 +460,7 @@ const handleEditRoles = (row) => {
 // 提交角色修改
 const submitRoles = async () => {
   try {
-    await userApi.updateUserRoles(roleForm.userId, selectedRoles.value)
+    await userStore.updateUserRoles(roleForm.userId, selectedRoles.value)
     ElMessage.success('角色更新成功')
     roleDialogVisible.value = false
     fetchUsers()

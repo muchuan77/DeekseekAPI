@@ -48,10 +48,40 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         
-        user.setFullName(userDTO.getFullName());
-        user.setEmail(userDTO.getEmail());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setStatus(userDTO.getStatus());
+        // 更新基本信息
+        if (userDTO.getFullName() != null) {
+            user.setFullName(userDTO.getFullName());
+        }
+        if (userDTO.getEmail() != null) {
+            user.setEmail(userDTO.getEmail());
+        }
+        if (userDTO.getPhoneNumber() != null) {
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+        if (userDTO.getUsername() != null) {
+            user.setUsername(userDTO.getUsername());
+        }
+        
+        // 更新状态相关字段
+        if (userDTO.getStatus() != null) {
+            user.setStatus(userDTO.getStatus());
+        }
+        if (userDTO.getLoginAttempts() != null) {
+            user.setLoginAttempts(userDTO.getLoginAttempts());
+        }
+        if (userDTO.getAccountLockedUntil() != null) {
+            user.setAccountLockedUntil(userDTO.getAccountLockedUntil());
+        }
+        
+        // 更新角色
+        if (userDTO.getRoles() != null && !userDTO.getRoles().isEmpty()) {
+            user.setRoles(new HashSet<>(userDTO.getRoles()));
+        }
+        
+        // 更新登录时间
+        if (userDTO.getLastLogin() != null) {
+            user.setLastLogin(userDTO.getLastLogin());
+        }
         
         return convertToDTO(userRepository.save(user));
     }

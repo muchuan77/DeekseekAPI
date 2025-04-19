@@ -128,17 +128,17 @@ API层根据功能分为不同的模块：
 #### 获取用户列表
 - 路径: `/api/users`
 - 方法: GET
-- 描述: 分页获取用户列表
+- 描述: 分页获取用户列表，支持关键字搜索和状态筛选
 - 前端实现: `frontend/src/api/user.js`
-- 权限: 需要管理员或版主权限
 - 查询参数:
-  - keyword: 搜索关键词
-  - status: 用户状态
+  - keyword: 搜索关键词（可选）
+  - status: 用户状态（可选）
   - page: 页码（默认0）
   - size: 每页大小（默认10）
 - 响应:
 ```json
 {
+  "success": true,
   "code": 200,
   "message": "success",
   "data": {
@@ -148,9 +148,12 @@ API层根据功能分为不同的模块：
         "username": "string",
         "email": "string",
         "fullName": "string",
-        "role": "string",
+        "roles": ["string"],
         "status": "string",
-        "createdAt": "string"
+        "createdAt": "string",
+        "lastLogin": "string",
+        "loginAttempts": "number",
+        "accountLockedUntil": "string"
       }
     ],
     "totalElements": "number",
@@ -160,20 +163,16 @@ API层根据功能分为不同的模块：
   }
 }
 ```
-- 状态码:
-  - 200: 获取成功
-  - 403: 无权限
-  - 500: 服务器内部错误
 
 #### 获取用户详情
 - 路径: `/api/users/{id}`
 - 方法: GET
 - 描述: 获取指定用户的详细信息
 - 前端实现: `frontend/src/api/user.js`
-- 权限: 需要用户权限（只能查看自己的信息，管理员和版主可以查看所有）
 - 响应:
 ```json
 {
+  "success": true,
   "code": 200,
   "message": "success",
   "data": {
@@ -181,34 +180,35 @@ API层根据功能分为不同的模块：
     "username": "string",
     "email": "string",
     "fullName": "string",
-    "role": "string",
+    "roles": ["string"],
     "status": "string",
-    "createdAt": "string"
+    "createdAt": "string",
+    "lastLogin": "string",
+    "loginAttempts": "number",
+    "accountLockedUntil": "string"
   }
 }
 ```
-- 状态码:
-  - 200: 获取成功
-  - 403: 无权限
-  - 404: 用户不存在
-  - 500: 服务器内部错误
 
-#### 更新用户信息
-- 路径: `/api/users/{id}`
-- 方法: PUT
-- 描述: 更新指定用户的信息
+#### 创建用户
+- 路径: `/api/users`
+- 方法: POST
+- 描述: 创建新用户
 - 前端实现: `frontend/src/api/user.js`
-- 权限: 需要用户权限（只能修改自己的信息，管理员可以修改所有）
 - 请求体:
 ```json
 {
+  "username": "string",
+  "password": "string",
   "email": "string",
-  "fullName": "string"
+  "fullName": "string",
+  "roles": ["string"]
 }
 ```
 - 响应:
 ```json
 {
+  "success": true,
   "code": 200,
   "message": "success",
   "data": {
@@ -216,80 +216,269 @@ API层根据功能分为不同的模块：
     "username": "string",
     "email": "string",
     "fullName": "string",
-    "role": "string",
+    "roles": ["string"],
     "status": "string"
   }
 }
 ```
-- 状态码:
-  - 200: 更新成功
-  - 403: 无权限
-  - 404: 用户不存在
-  - 500: 服务器内部错误
+
+#### 更新用户
+- 路径: `/api/users/{id}`
+- 方法: PUT
+- 描述: 更新指定用户的信息
+- 前端实现: `frontend/src/api/user.js`
+- 请求体:
+```json
+{
+  "username": "string",
+  "email": "string",
+  "fullName": "string",
+  "roles": ["string"]
+}
+```
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": "number",
+    "username": "string",
+    "email": "string",
+    "fullName": "string",
+    "roles": ["string"],
+    "status": "string"
+  }
+}
+```
 
 #### 删除用户
 - 路径: `/api/users/{id}`
 - 方法: DELETE
 - 描述: 删除指定用户
 - 前端实现: `frontend/src/api/user.js`
-- 权限: 需要管理员权限
 - 响应:
 ```json
 {
+  "success": true,
   "code": 200,
-  "message": "success"
+  "message": "success",
+  "data": null
 }
 ```
-- 状态码:
-  - 200: 删除成功
-  - 403: 无权限
-  - 404: 用户不存在
-  - 500: 服务器内部错误
 
-#### 重置用户密码
+#### 更新用户状态
+- 路径: `/api/users/{id}/status`
+- 方法: PUT
+- 描述: 更新指定用户的状态
+- 前端实现: `frontend/src/api/user.js`
+- 请求参数:
+  - status: 用户状态 (ENABLED/DISABLED/LOCKED)
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
+
+#### 更新用户角色
+- 路径: `/api/users/{id}/roles`
+- 方法: PUT
+- 描述: 更新指定用户的角色
+- 前端实现: `frontend/src/api/user.js`
+- 请求体:
+```json
+["ROLE_ADMIN", "ROLE_USER"]
+```
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
+
+#### 重置密码
 - 路径: `/api/users/{id}/reset-password`
 - 方法: POST
 - 描述: 重置指定用户的密码
 - 前端实现: `frontend/src/api/user.js`
-- 权限: 需要管理员权限
 - 响应:
 ```json
 {
+  "success": true,
   "code": 200,
-  "message": "success"
+  "message": "success",
+  "data": null
 }
 ```
-- 状态码:
-  - 200: 重置成功
-  - 403: 无权限
-  - 404: 用户不存在
-  - 500: 服务器内部错误
 
 #### 修改密码
 - 路径: `/api/users/{id}/change-password`
 - 方法: POST
 - 描述: 修改当前用户的密码
 - 前端实现: `frontend/src/api/user.js`
-- 权限: 需要用户权限（只能修改自己的密码）
+- 请求参数:
+  - oldPassword: 旧密码
+  - newPassword: 新密码
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
+
+#### 批量更新状态
+- 路径: `/api/users/batch/status`
+- 方法: POST
+- 描述: 批量更新多个用户的状态
+- 前端实现: `frontend/src/api/user.js`
 - 请求体:
 ```json
 {
-  "oldPassword": "string",
-  "newPassword": "string"
+  "ids": [1, 2, 3],
+  "status": "ENABLED"
 }
 ```
 - 响应:
 ```json
 {
+  "success": true,
   "code": 200,
-  "message": "success"
+  "message": "success",
+  "data": null
 }
 ```
-- 状态码:
-  - 200: 修改成功
-  - 403: 无权限
-  - 400: 旧密码错误
-  - 500: 服务器内部错误
+
+#### 批量删除
+- 路径: `/api/users/batch/delete`
+- 方法: POST
+- 描述: 批量删除多个用户
+- 前端实现: `frontend/src/api/user.js`
+- 请求体:
+```json
+[1, 2, 3]
+```
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
+
+#### 导入用户
+- 路径: `/api/users/import`
+- 方法: POST
+- 描述: 从文件导入用户数据
+- 前端实现: `frontend/src/api/user.js`
+- 请求体: multipart/form-data
+  - file: 用户数据文件
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
+
+#### 导出用户
+- 路径: `/api/users/export`
+- 方法: GET
+- 描述: 导出用户数据
+- 前端实现: `frontend/src/api/user.js`
+- 查询参数:
+  - keyword: 搜索关键词（可选）
+  - status: 用户状态（可选）
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "id": "number",
+      "username": "string",
+      "email": "string",
+      "fullName": "string",
+      "roles": ["string"],
+      "status": "string",
+      "createdAt": "string",
+      "lastLogin": "string"
+    }
+  ]
+}
+```
+
+#### 锁定用户
+- 路径: `/api/users/{id}/lock`
+- 方法: POST
+- 描述: 锁定指定用户
+- 前端实现: `frontend/src/api/user.js`
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
+
+#### 解锁用户
+- 路径: `/api/users/{id}/unlock`
+- 方法: POST
+- 描述: 解锁指定用户
+- 前端实现: `frontend/src/api/user.js`
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
+
+#### 获取当前用户
+- 路径: `/api/users/me`
+- 方法: GET
+- 描述: 获取当前登录用户的信息
+- 前端实现: `frontend/src/api/user.js`
+- 响应:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": "number",
+    "username": "string",
+    "email": "string",
+    "fullName": "string",
+    "roles": ["string"],
+    "status": "string",
+    "createdAt": "string",
+    "lastLogin": "string",
+    "loginAttempts": "number",
+    "accountLockedUntil": "string"
+  }
+}
+```
 
 ### 谣言管理 (`rumor.js`)
 谣言相关操作：
