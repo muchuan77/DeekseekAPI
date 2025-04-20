@@ -2,11 +2,12 @@
 
 ## 项目简介
 
-本后端服务是谣言溯源系统的核心组件，基于Spring Boot 3.x开发，集成了DeepSeek API、Elasticsearch等技术，提供谣言检测、传播追踪等核心功能。
+本后端服务是谣言溯源系统的核心组件，基于Spring Boot 2.7.12开发，集成了DeepSeek API、Elasticsearch、区块链等技术，提供谣言检测、传播追踪等核心功能。
 
 ### 核心特性
 - 多模态谣言检测：支持文本、图片、视频等多种形式的内容分析
 - 智能传播追踪：基于图论和机器学习算法分析传播路径
+- 区块链存证：关键数据上链，确保数据不可篡改
 - 实时数据分析：提供多维度的数据统计和可视化
 - 权限管理：基于RBAC的细粒度权限控制
 - 软删除支持：所有实体支持软删除
@@ -15,15 +16,17 @@
 - 分布式缓存：使用Redis进行缓存管理
 - 全文搜索：使用Elasticsearch进行高效检索
 - 多环境配置：支持开发、测试、生产环境配置
+- Excel导出：支持数据导出为Excel格式
 
 ## 技术架构
 
 ### 核心框架
-- Spring Boot 3.x：提供快速开发框架
+- Spring Boot 2.7.12：提供快速开发框架
 - Spring Security：安全认证和授权
 - Spring Data JPA：数据持久化
 - Spring Data Redis：缓存管理
 - Spring Data Elasticsearch：全文搜索
+- Spring Cloud OpenFeign：服务间通信
 - Spring Data REST：RESTful API支持
 - Spring Data Envers：审计日志支持
 
@@ -38,10 +41,14 @@
   - 会话管理
   - 热点数据缓存
   - 分布式锁
-- Elasticsearch：全文搜索
+- Elasticsearch 7.17.4：全文搜索
   - 谣言内容索引
   - 快速检索
   - 聚合分析
+- 区块链：数据存证
+  - 关键数据上链
+  - 数据不可篡改
+  - 时间戳服务
 
 ### AI服务集成
 - DeepSeek API
@@ -54,10 +61,11 @@
 
 ### 开发工具
 - Lombok：简化代码
-- MapStruct：对象映射
+- MapStruct 1.5.3：对象映射
 - Maven：依赖管理
-- Swagger：API文档
+- SpringDoc OpenAPI 1.7.0：API文档
 - Git：版本控制
+- Apache POI 5.2.3：Excel处理
 
 ## 系统要求
 
@@ -71,6 +79,7 @@
 - MySQL 8.0+
 - Redis 6.x+
 - Elasticsearch 7.17.4+
+- 区块链节点
 - 操作系统：Linux/Windows/macOS
 
 ## 快速开始
@@ -141,7 +150,8 @@ src/main/java/com/rumor/tracing/
 │   ├── LogSecurityConfig.java
 │   ├── LogElasticsearchConfig.java
 │   ├── JpaConfig.java
-│   └── RestTemplateConfig.java
+│   ├── RestTemplateConfig.java
+│   └── BlockchainConfig.java
 ├── controller/      # 控制器层
 │   ├── AuthController.java
 │   ├── UserController.java
@@ -151,6 +161,7 @@ src/main/java/com/rumor/tracing/
 │   ├── LogController.java
 │   ├── PermissionController.java
 │   ├── PropagationController.java
+│   ├── BlockchainController.java
 │   └── SystemController.java
 ├── service/         # 服务层
 │   ├── impl/
@@ -158,7 +169,8 @@ src/main/java/com/rumor/tracing/
 │   │   ├── RumorServiceImpl.java
 │   │   ├── OperationLogServiceImpl.java
 │   │   ├── PropagationAnalysisServiceImpl.java
-│   │   └── DeepSeekAIServiceImpl.java
+│   │   ├── DeepSeekAIServiceImpl.java
+│   │   └── BlockchainServiceImpl.java
 │   ├── AuthService.java
 │   ├── UserService.java
 │   ├── RumorService.java
@@ -168,6 +180,7 @@ src/main/java/com/rumor/tracing/
 │   ├── PropagationAnalysisService.java
 │   ├── LoggingService.java
 │   ├── PermissionService.java
+│   ├── BlockchainService.java
 │   └── SystemService.java
 ├── repository/      # 数据访问层
 ├── entity/         # 实体类
@@ -181,6 +194,7 @@ src/main/java/com/rumor/tracing/
 │   ├── DeepSeekAnalysis.java
 │   ├── PropagationPath.java
 │   ├── InfluenceAnalysis.java
+│   ├── BlockchainRecord.java
 │   └── BaseEntity.java
 ├── dto/            # 数据传输对象
 ├── exception/      # 异常处理
@@ -248,7 +262,23 @@ src/main/java/com/rumor/tracing/
   - 传播路径追踪
   - 实时告警
 
-### 4. 日志管理服务
+### 4. 区块链存证服务
+- 数据上链
+  - 关键数据哈希
+  - 时间戳服务
+  - 数据验证
+  - 存证查询
+- 智能合约
+  - 存证合约
+  - 验证合约
+  - 查询合约
+- 区块链集成
+  - 节点管理
+  - 交易管理
+  - 区块查询
+  - 事件监听
+
+### 5. 日志管理服务
 - 操作日志
   - 用户操作记录
   - 系统操作记录

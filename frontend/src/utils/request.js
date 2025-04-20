@@ -65,37 +65,16 @@ service.interceptors.response.use(
     
     // 如果请求不成功
     if (res.code !== 200) {
-      ElMessage({
-        message: res.message || '系统错误',
-        type: 'error',
-        duration: 5 * 1000
-      })
-      
-      // 401: 未登录或token过期
-      if (res.code === 401) {
-        router.push('/401')
-        return Promise.reject(new Error('请先登录'))
+      console.warn('请求返回非200状态:', res)
+      // 对于500错误，返回一个标准格式的错误响应
+      if (response.status === 500) {
+        return {
+          code: 500,
+          data: null,
+          message: res.message || '服务器内部错误，请稍后重试'
+        }
       }
-      
-      // 403: 无权限
-      if (res.code === 403) {
-        router.push('/403')
-        return Promise.reject(new Error('无权限访问'))
-      }
-
-      // 400: 请求参数错误
-      if (res.code === 400) {
-        router.push('/400')
-        return Promise.reject(new Error('请求参数错误'))
-      }
-
-      // 500: 服务器内部错误
-      if (res.code === 500) {
-        router.push('/500')
-        return Promise.reject(new Error('服务器内部错误'))
-      }
-      
-      return Promise.reject(new Error(res.message || '系统错误'))
+      return Promise.reject(res)
     }
     
     return res
@@ -105,32 +84,39 @@ service.interceptors.response.use(
     if (error.response) {
       // 请求已发出，但服务器响应的状态码不在 2xx 范围内
       const res = error.response.data
+      const status = error.response.status
       const message = res?.message || '系统错误'
       
-      switch (error.response.status) {
-        case 400:
-          router.push('/400')
-          break
-        case 401:
-          router.push('/401')
-          break
-        case 403:
-          router.push('/403')
-          break
-        case 404:
-          router.push('/404')
-          break
-        case 500:
-          router.push('/500')
-          break
-        default:
-          ElMessage.error(message)
+      console.error(`请求失败 (${status}):`, res)
+      
+      // 对于500错误，返回一个标准格式的错误响应
+      if (status === 500) {
+        return {
+          code: 500,
+          data: null,
+          message: message
+        }
+      }
+      
+      // 401: 未登录或token过期
+      if (status === 401) {
+        ElMessage.error('请先登录')
+      }
+      // 403: 无权限
+      else if (status === 403) {
+        ElMessage.error('无权限访问')
+      }
+      // 其他错误
+      else {
+        ElMessage.error(message)
       }
     } else if (error.request) {
       // 请求已发出，但没有收到响应
+      console.error('网络错误:', error)
       ElMessage.error('网络连接失败')
     } else {
       // 请求配置出错
+      console.error('请求配置错误:', error)
       ElMessage.error('请求配置错误')
     }
     

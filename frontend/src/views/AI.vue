@@ -472,6 +472,7 @@ const analyzeTextContent = async () => {
     if (result && result.code === 200) {
       // 直接使用返回的数据，因为格式已经匹配
       analysisResult.value = result.data
+      handleAnalysisComplete(result.data)
       ElMessage.success('分析完成')
     } else {
       ElMessage.error(result?.message || '分析失败')
@@ -504,6 +505,7 @@ const analyzeImageContent = async () => {
     const result = await analyzeImage(formData)
     if (result && result.code === 200) {
       analysisResult.value = result.data
+      handleAnalysisComplete(result.data)
       ElMessage.success('分析完成')
     } else {
       ElMessage.error(result?.message || '分析失败')
@@ -536,6 +538,7 @@ const analyzeVideoContent = async () => {
     const result = await analyzeVideo(formData)
     if (result && result.code === 200) {
       analysisResult.value = result.data
+      handleAnalysisComplete(result.data)
       ElMessage.success('分析完成')
     } else {
       ElMessage.error(result?.message || '分析失败')
@@ -615,6 +618,7 @@ const analyzeMultiModalContent = async () => {
     const result = await analyzeMultiModal(formData)
     if (result && result.code === 200) {
       analysisResult.value = result.data
+      handleAnalysisComplete(result.data)
       ElMessage.success('分析完成')
     } else {
       ElMessage.error(result?.message || '分析失败')
@@ -626,6 +630,15 @@ const analyzeMultiModalContent = async () => {
     stopProgressSimulation()
     loading.value = false
   }
+}
+
+// 在分析完成后添加事件触发
+const handleAnalysisComplete = (result) => {
+  emit('analysis-complete', {
+    analysis: result.analysis,
+    confidence: result.confidence,
+    details: result.details
+  })
 }
 </script>
 

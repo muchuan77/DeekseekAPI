@@ -2,7 +2,7 @@
   <div class="admin-dashboard">
     <el-row :gutter="20">
       <el-col :span="6" v-for="(card, index) in cards" :key="index">
-        <el-card shadow="hover" class="dashboard-card">
+        <el-card shadow="hover" class="dashboard-card" v-loading="loading">
           <div class="card-content">
             <div class="card-icon" :style="{ backgroundColor: card.color }">
               <el-icon><component :is="card.icon" /></el-icon>
@@ -18,47 +18,58 @@
 
     <el-row :gutter="20" class="chart-row">
       <el-col :span="12">
-        <el-card shadow="hover">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
-              <span>用户增长趋势</span>
+              <span>用户活跃度</span>
+              <el-radio-group v-model="timeRange" size="small" @change="handleTimeRangeChange">
+                <el-radio-button value="week">本周</el-radio-button>
+                <el-radio-button value="month">本月</el-radio-button>
+                <el-radio-button value="year">本年</el-radio-button>
+              </el-radio-group>
             </div>
           </template>
-          <div class="chart-container">
-            <!-- 这里可以添加图表组件 -->
+          <div class="chart-container" v-if="showCharts">
+            <v-chart class="chart" :option="userActivityOption" autoresize />
           </div>
+          <div v-else class="no-data">暂无数据</div>
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card shadow="hover">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
-              <span>系统资源使用情况</span>
+              <span>操作类型分布</span>
             </div>
           </template>
-          <div class="chart-container">
-            <!-- 这里可以添加图表组件 -->
+          <div class="chart-container" v-if="showCharts">
+            <v-chart class="chart" :option="operationTypeOption" autoresize />
           </div>
+          <div v-else class="no-data">暂无数据</div>
         </el-card>
       </el-col>
     </el-row>
 
     <el-row :gutter="20" class="table-row">
       <el-col :span="24">
-        <el-card shadow="hover">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
-              <span>最近活动</span>
+              <span>最近操作日志</span>
             </div>
           </template>
-          <el-table :data="activities" style="width: 100%">
-            <el-table-column prop="time" label="时间" width="180" />
-            <el-table-column prop="user" label="用户" width="120" />
-            <el-table-column prop="action" label="操作" />
+          <el-table :data="logStore.operationLogs" style="width: 100%">
+            <el-table-column prop="createTime" label="时间" width="180">
+              <template #default="{ row }">
+                {{ formatDate(row.createTime) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="username" label="用户" width="120" />
+            <el-table-column prop="operation" label="操作" />
             <el-table-column prop="status" label="状态" width="100">
               <template #default="{ row }">
-                <el-tag :type="row.status === '成功' ? 'success' : 'danger'">
-                  {{ row.status }}
+                <el-tag :type="row.status === 'SUCCESS' ? 'success' : 'danger'">
+                  {{ row.status === 'SUCCESS' ? '成功' : '失败' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -70,58 +81,201 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-// import { getDashboardData, getSystemOverview, getRecentActivities, getPerformanceMetrics } from '@/api/dashboard' // Comment out unused imports
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { LineChart, PieChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+} from 'echarts/components'
+import VChart from 'vue-echarts'
+import { User, Connection, Document, Warning } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
+import { useLogStore } from '@/stores/log'
+import { useSystemStore } from '@/stores/system'
+import { formatDate } from '@/utils/date'
 
-const cards = ref([
+use([
+  CanvasRenderer,
+  LineChart,
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+])
+
+const userStore = useUserStore()
+const logStore = useLogStore()
+const systemStore = useSystemStore()
+const timeRange = ref('week')
+const loading = ref(false)
+const showCharts = ref(false)
+
+// 数据卡片
+const cards = computed(() => [
   {
     label: '总用户数',
-    value: '0',
-    icon: 'User',
+    value: userStore.totalUsers || 0,
+    icon: User,
     color: '#409EFF'
   },
   {
     label: '今日活跃',
-    value: '0',
-    icon: 'Connection',
+    value: logStore.userActivityData.counts[logStore.userActivityData.counts.length - 1] || 0,
+    icon: Connection,
     color: '#67C23A'
   },
   {
     label: '待处理任务',
-    value: '0',
-    icon: 'Document',
+    value: systemStore.status?.pendingTasks || 0,
+    icon: Document,
     color: '#E6A23C'
   },
   {
     label: '系统警告',
-    value: '0',
-    icon: 'Warning',
+    value: systemStore.status?.warnings || 0,
+    icon: Warning,
     color: '#F56C6C'
   }
 ])
 
-const activities = ref([]) // Keep this as it's used in the template's el-table
-// Comment out unused state variables
-// const loading = ref(false)
-// const statistics = ref({})
-// const systemOverview = ref({})
-// const recentActivities = ref([]) // activities is used instead
-// const performanceMetrics = ref({})
-// const error = ref(null)
+// 用户活跃度图表配置
+const userActivityOption = computed(() => {
+  if (!showCharts.value) return {}
+  const dates = logStore.userActivityData.dates || []
+  const counts = logStore.userActivityData.counts || []
+  
+  return {
+    tooltip: {
+      trigger: 'axis'
+    },
+    xAxis: {
+      type: 'category',
+      data: dates.length > 0 ? dates : ['暂无数据'],
+      axisLabel: {
+        interval: 0,
+        rotate: 45
+      }
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1
+    },
+    series: [{
+      data: counts.length > 0 ? counts : [0],
+      type: 'line',
+      smooth: true,
+      name: '活跃用户数',
+      itemStyle: {
+        color: '#409EFF'
+      }
+    }]
+  }
+})
 
-// Comment out the unused function definition
-// const loadData = async () => {
-//   console.log("Skipping data loading in admin dashboard for now.")
-// }
+// 操作类型分布图表配置
+const operationTypeOption = computed(() => {
+  if (!showCharts.value) return {}
+  const data = logStore.operationTypeData || []
+  
+  return {
+    tooltip: {
+      trigger: 'item'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left'
+    },
+    series: [{
+      type: 'pie',
+      radius: '50%',
+      data: data.length > 0 ? data : [{ name: '暂无数据', value: 1 }],
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    }]
+  }
+})
 
-onMounted(() => {
-  // loadData() // Call remains commented out
-  // If activities needs mock data, add it here:
-  activities.value = [
-    { time: '2024-07-28 10:00', user: 'admin', action: '登录系统', status: '成功' },
-    { time: '2024-07-28 09:30', user: 'user1', action: '提交谣言检测', status: '成功' },
-    { time: '2024-07-28 09:00', user: 'admin', action: '更新用户角色', status: '成功' },
-  ];
+// 获取仪表盘数据
+const fetchDashboardData = async () => {
+  loading.value = true
+  showCharts.value = false
+  try {
+    // 获取用户数据
+    await userStore.fetchUserList({
+      page: 0,
+      size: 1
+    })
+    
+    // 获取系统状态
+    await systemStore.fetchStatus()
+    
+    // 获取日志数据
+    const [operationLogs, userActivity, operationTypes] = await Promise.all([
+      logStore.fetchOperationLogs({
+        page: 0,
+        size: 10
+      }),
+      logStore.fetchUserActivityData(
+        getTimeRangeStart(timeRange.value),
+        new Date().toISOString()
+      ),
+      logStore.fetchOperationTypeData(
+        getTimeRangeStart(timeRange.value),
+        new Date().toISOString()
+      )
+    ])
+
+    // 等待DOM更新
+    await nextTick()
+    
+    // 检查是否有数据
+    const hasData = logStore.userActivityData.dates.length > 0 ||
+                   logStore.operationTypeData.length > 0 ||
+                   logStore.operationLogs.length > 0
+
+    if (hasData) {
+      showCharts.value = true
+      await nextTick()
+    }
+  } catch (error) {
+    console.error('获取仪表盘数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取时间范围起始时间
+const getTimeRangeStart = (range) => {
+  const now = new Date()
+  switch (range) {
+    case 'week':
+      return new Date(now.setDate(now.getDate() - 7)).toISOString()
+    case 'month':
+      return new Date(now.setMonth(now.getMonth() - 1)).toISOString()
+    case 'year':
+      return new Date(now.setFullYear(now.getFullYear() - 1)).toISOString()
+    default:
+      return new Date(now.setDate(now.getDate() - 7)).toISOString()
+  }
+}
+
+// 处理时间范围变化
+const handleTimeRangeChange = async () => {
+  await fetchDashboardData()
+}
+
+onMounted(async () => {
+  await fetchDashboardData()
 })
 </script>
 
@@ -185,5 +339,14 @@ onMounted(() => {
 
 .chart-container {
   height: 300px;
+}
+
+.no-data {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #909399;
+  font-size: 14px;
 }
 </style> 

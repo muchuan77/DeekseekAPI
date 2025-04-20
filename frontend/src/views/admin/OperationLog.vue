@@ -102,18 +102,67 @@ export default {
     const fetchLogs = async () => {
       loading.value = true
       try {
-        await logStore.fetchOperationLogs({
+        let startTime = null
+        let endTime = null
+        if (searchForm.dateRange && searchForm.dateRange.length === 2) {
+          startTime = searchForm.dateRange[0] ? `${searchForm.dateRange[0]}T00:00:00.000Z` : null
+          endTime = searchForm.dateRange[1] ? `${searchForm.dateRange[1]}T23:59:59.999Z` : null
+        }
+
+        const params = {
           page: currentPage.value - 1,
           size: pageSize.value,
-          operationType: searchForm.operationType,
-          username: searchForm.username,
-          startTime: searchForm.dateRange?.[0],
-          endTime: searchForm.dateRange?.[1]
+          operationType: searchForm.operationType || null,
+          username: searchForm.username || null,
+          startTime,
+          endTime
+        }
+
+        // 移除空值参数
+        Object.keys(params).forEach(key => {
+          if (params[key] === null || params[key] === undefined || params[key] === '') {
+            delete params[key]
+          }
         })
-        total.value = logStore.operationLogs.length
+
+        const result = await logStore.fetchOperationLogs(params)
+        total.value = result.totalElements || 0
+        
+        if (logStore.operationLogs.length === 0) {
+          ElMessage.info('暂无操作日志数据')
+        }
       } catch (error) {
-        ElMessage.error('获取操作日志失败')
-        console.error(error)
+        if (error.response) {
+          const status = error.response.status
+          switch (status) {
+            case 400:
+              ElMessage.error('请求参数错误，请检查输入')
+              break
+            case 401:
+              ElMessage.error('未授权，请重新登录')
+              break
+            case 403:
+              ElMessage.error('没有权限访问此资源')
+              break
+            case 404:
+              ElMessage.info('暂无操作日志数据')
+              logStore.operationLogs = []
+              total.value = 0
+              break
+            case 500:
+              ElMessage.error('服务器内部错误，请稍后重试')
+              break
+            default:
+              ElMessage.error('获取操作日志失败')
+          }
+          console.error(`请求失败 (${status}):`, error)
+        } else if (error.request) {
+          ElMessage.error('网络连接失败，请检查网络设置')
+          console.error('网络错误:', error)
+        } else {
+          ElMessage.error('获取操作日志失败')
+          console.error('请求错误:', error)
+        }
       } finally {
         loading.value = false
       }
@@ -221,5 +270,30 @@ export default {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* 添加下拉框样式 */
+:deep(.el-select) {
+  width: 200px;
+}
+
+:deep(.el-select-dropdown__item) {
+  white-space: normal;
+  height: auto;
+  padding: 8px 10px;
+  line-height: 1.5;
+}
+
+:deep(.el-select-dropdown__item span) {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:deep(.el-select-dropdown__item.selected) {
+  color: #409EFF;
+  font-weight: bold;
 }
 </style> 

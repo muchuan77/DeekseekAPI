@@ -27,8 +27,12 @@
             <el-icon><Cpu /></el-icon>
             <span>AI分析</span>
           </el-menu-item>
+          <el-menu-item index="/flow">
+            <el-icon><Operation /></el-icon>
+            <span>工作流程</span>
+          </el-menu-item>
           <el-menu-item index="/propagation">
-            <el-icon><Cpu /></el-icon>
+            <el-icon><Share /></el-icon>
             <span>传播分析</span>
           </el-menu-item>
           <el-menu-item index="/trace"> 
@@ -100,7 +104,9 @@ import {
   User,
   Setting,
   ArrowDown,
-  Cpu
+  Cpu,
+  Operation,
+  Share
 } from '@element-plus/icons-vue'
 
 const route = useRoute()

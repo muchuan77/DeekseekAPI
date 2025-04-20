@@ -1,8 +1,8 @@
 <template>
   <div class="dashboard">
     <el-row :gutter="20">
-      <el-col :span="6" v-for="(card, index) in cards" :key="index">
-        <el-card shadow="hover" class="dashboard-card" v-loading="dashboardStore.loading">
+      <el-col :span="4" v-for="(card, index) in cards" :key="index">
+        <el-card shadow="hover" class="dashboard-card" v-loading="loading">
           <div class="card-content">
             <div class="card-icon" :style="{ backgroundColor: card.color }">
               <el-icon><component :is="card.icon" /></el-icon>
@@ -18,7 +18,7 @@
 
     <el-row :gutter="20" class="chart-row">
       <el-col :span="12">
-        <el-card shadow="hover" v-loading="dashboardStore.loading">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
               <span>谣言趋势</span>
@@ -29,35 +29,66 @@
               </el-radio-group>
             </div>
           </template>
-          <div class="chart-container">
+          <div class="chart-container" v-if="showCharts">
             <v-chart class="chart" :option="trendOption" autoresize />
           </div>
+          <div v-else class="no-data">暂无数据</div>
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card shadow="hover" v-loading="dashboardStore.loading">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
               <span>谣言类型分布</span>
             </div>
           </template>
-          <div class="chart-container">
+          <div class="chart-container" v-if="showCharts">
             <v-chart class="chart" :option="categoryOption" autoresize />
           </div>
+          <div v-else class="no-data">暂无数据</div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="20" class="chart-row">
+      <el-col :span="12">
+        <el-card shadow="hover" v-loading="loading">
+          <template #header>
+            <div class="card-header">
+              <span>传播分析</span>
+            </div>
+          </template>
+          <div class="chart-container" v-if="showCharts">
+            <v-chart class="chart" :option="propagationOption" autoresize />
+          </div>
+          <div v-else class="no-data">暂无数据</div>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card shadow="hover" v-loading="loading">
+          <template #header>
+            <div class="card-header">
+              <span>谣言类型分布</span>
+            </div>
+          </template>
+          <div class="chart-container" v-if="showCharts">
+            <v-chart class="chart" :option="categoryOption" autoresize />
+          </div>
+          <div v-else class="no-data">暂无数据</div>
         </el-card>
       </el-col>
     </el-row>
 
     <el-row :gutter="20" class="table-row">
       <el-col :span="24">
-        <el-card shadow="hover" v-loading="dashboardStore.loading">
+        <el-card shadow="hover" v-loading="loading">
           <template #header>
             <div class="card-header">
               <span>最近谣言</span>
               <el-button link @click="viewAllRumors">查看全部</el-button>
             </div>
           </template>
-          <el-table :data="dashboardStore.recentRumors" style="width: 100%">
+          <el-table :data="rumorStore.rumors" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80" />
             <el-table-column prop="content" label="内容" show-overflow-tooltip />
             <el-table-column prop="source" label="来源" width="120" />
@@ -68,14 +99,9 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="timestamp" label="时间" width="180">
+            <el-table-column prop="createTime" label="时间" width="180">
               <template #default="{ row }">
-                {{ formatDate(row.timestamp) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="120">
-              <template #default="{ row }">
-                <el-button link @click="viewDetail(row)">查看详情</el-button>
+                {{ formatDate(row.createTime) }}
               </template>
             </el-table-column>
           </el-table>
@@ -86,11 +112,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { LineChart, PieChart } from 'echarts/charts'
+import { LineChart, PieChart, BarChart } from 'echarts/charts'
 import {
   TitleComponent,
   TooltipComponent,
@@ -98,14 +124,16 @@ import {
   GridComponent
 } from 'echarts/components'
 import VChart from 'vue-echarts'
-import { Document, QuestionFilled, Check, Close } from '@element-plus/icons-vue'
-import { useDashboardStore } from '@/stores/dashboard'
+import { Document, QuestionFilled, Check, Close, Connection } from '@element-plus/icons-vue'
+import { useRumorStore } from '@/stores/rumor'
+import { usePropagationStore } from '@/stores/propagation'
 import { formatDate } from '@/utils/date'
 
 use([
   CanvasRenderer,
   LineChart,
   PieChart,
+  BarChart,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
@@ -113,102 +141,121 @@ use([
 ])
 
 const router = useRouter()
-const dashboardStore = useDashboardStore()
+const rumorStore = useRumorStore()
+const propagationStore = usePropagationStore()
 const trendTimeRange = ref('week')
+const loading = ref(false)
+const showCharts = ref(false)
+
+// 添加本地状态管理
+const dashboardData = ref({
+  totalRumors: 0,
+  pendingRumors: 0,
+  verifiedRumors: 0,
+  falseRumors: 0,
+  trendData: {
+    dates: [],
+    counts: []
+  },
+  categoryData: [],
+  propagationData: {
+    dates: [],
+    counts: []
+  }
+})
 
 // 数据卡片
 const cards = computed(() => [
   {
     title: '总谣言数',
-    value: dashboardStore.totalRumors,
+    value: dashboardData.value.totalRumors,
     icon: Document,
     color: '#409EFF'
   },
   {
     title: '待验证',
-    value: dashboardStore.pendingRumors,
+    value: dashboardData.value.pendingRumors,
     icon: QuestionFilled,
     color: '#E6A23C'
   },
   {
     title: '已验证',
-    value: dashboardStore.verifiedRumors,
+    value: dashboardData.value.verifiedRumors,
     icon: Check,
     color: '#67C23A'
   },
   {
     title: '已证伪',
-    value: dashboardStore.falseRumors,
+    value: dashboardData.value.falseRumors,
     icon: Close,
     color: '#F56C6C'
+  },
+  {
+    title: '传播分析',
+    value: dashboardData.value.propagationData.counts.length,
+    icon: Connection,
+    color: '#9C27B0'
   }
 ])
 
-// 趋势图表配置
-const trendOption = computed(() => ({
-  tooltip: {
-    trigger: 'axis'
-  },
-  xAxis: {
-    type: 'category',
-    data: dashboardStore.trendData.dates || []
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [{
-    data: dashboardStore.trendData.counts || [],
-    type: 'line',
-    smooth: true
-  }]
-}))
-
-// 分类图表配置
-const categoryOption = computed(() => ({
-  tooltip: {
-    trigger: 'item'
-  },
-  legend: {
-    orient: 'vertical',
-    left: 'left'
-  },
-  series: [{
-    type: 'pie',
-    radius: '50%',
-    data: dashboardStore.categoryData || [],
-    emphasis: {
-      itemStyle: {
-        shadowBlur: 10,
-        shadowOffsetX: 0,
-        shadowColor: 'rgba(0, 0, 0, 0.5)'
-      }
+// 获取仪表盘数据
+const fetchDashboardData = async () => {
+  loading.value = true
+  showCharts.value = false
+  try {
+    // 获取谣言数据
+    await rumorStore.fetchRumors({
+      page: 0,
+      size: 10
+    })
+    
+    // 获取传播数据 - 使用第一个谣言ID
+    const firstRumorId = rumorStore.rumors[0]?.id
+    if (firstRumorId) {
+      await propagationStore.getPropagationTrends(firstRumorId)
     }
-  }]
-}))
+    
+    // 更新本地状态
+    dashboardData.value = {
+      totalRumors: rumorStore.total || 0,
+      pendingRumors: rumorStore.rumors?.filter(r => r.status === 'PENDING').length || 0,
+      verifiedRumors: rumorStore.rumors?.filter(r => r.status === 'VERIFIED').length || 0,
+      falseRumors: rumorStore.rumors?.filter(r => r.status === 'FALSE').length || 0,
+      trendData: {
+        dates: rumorStore.rumors?.map(r => formatDate(r.createTime)) || [],
+        counts: rumorStore.rumors?.map((_, i) => i + 1) || []
+      },
+      categoryData: Object.entries(
+        (rumorStore.rumors || []).reduce((acc, r) => {
+          acc[r.type] = (acc[r.type] || 0) + 1
+          return acc
+        }, {})
+      ).map(([name, value]) => ({ name, value })),
+      propagationData: propagationStore.trendData || { dates: [], counts: [] }
+    }
 
-// 获取状态类型
-const getStatusType = (status) => {
-  const types = {
-    '待验证': 'warning',
-    '已验证': 'success',
-    '已证伪': 'danger'
-  }
-  return types[status] || 'info'
-}
+    // 等待DOM更新
+    await nextTick()
+    
+    // 检查是否有数据
+    const hasData = dashboardData.value.trendData.dates.length > 0 ||
+                   dashboardData.value.categoryData.length > 0 ||
+                   dashboardData.value.propagationData.dates.length > 0
 
-// 获取状态文本
-const getStatusText = (status) => {
-  const texts = {
-    '待验证': '待验证',
-    '已验证': '已验证',
-    '已证伪': '已证伪'
+    if (hasData) {
+      showCharts.value = true
+      await nextTick()
+    }
+  } catch (error) {
+    console.error('获取仪表盘数据失败:', error)
+  } finally {
+    loading.value = false
   }
-  return texts[status] || '未知'
 }
 
 // 处理时间范围变化
 const handleTimeRangeChange = async () => {
-  await dashboardStore.fetchDashboardData(trendTimeRange.value)
+  await fetchDashboardData()
 }
 
 // 查看全部谣言
@@ -216,13 +263,133 @@ const viewAllRumors = () => {
   router.push('/rumors')
 }
 
-// 查看详情
-const viewDetail = (row) => {
-  router.push(`/rumors/${row.id}`)
+// 获取状态类型
+const getStatusType = (status) => {
+  const types = {
+    'PENDING': 'warning',
+    'VERIFIED': 'success',
+    'FALSE': 'danger'
+  }
+  return types[status] || 'info'
+}
+
+// 获取状态文本
+const getStatusText = (status) => {
+  const texts = {
+    'PENDING': '待验证',
+    'VERIFIED': '已验证',
+    'FALSE': '已证伪'
+  }
+  return texts[status] || '未知'
 }
 
 onMounted(async () => {
-  await dashboardStore.fetchDashboardData(trendTimeRange.value)
+  await fetchDashboardData()
+})
+
+// 趋势图表配置
+const trendOption = computed(() => {
+  if (!showCharts.value) return {}
+  const dates = dashboardData.value.trendData.dates || []
+  const counts = dashboardData.value.trendData.counts || []
+  const propagationCounts = dashboardData.value.propagationData.counts || []
+  
+  return {
+    tooltip: {
+      trigger: 'axis'
+    },
+    xAxis: {
+      type: 'category',
+      data: dates.length > 0 ? dates : ['暂无数据'],
+      axisLabel: {
+        interval: 0,
+        rotate: 45
+      }
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1
+    },
+    series: [{
+      data: counts.length > 0 ? counts : [0],
+      type: 'line',
+      smooth: true,
+      name: '谣言数量',
+      itemStyle: {
+        color: '#409EFF'
+      }
+    }, {
+      data: propagationCounts.length > 0 ? propagationCounts : [0],
+      type: 'line',
+      smooth: true,
+      name: '传播分析',
+      itemStyle: {
+        color: '#9C27B0'
+      }
+    }]
+  }
+})
+
+// 分类图表配置
+const categoryOption = computed(() => {
+  if (!showCharts.value) return {}
+  const data = dashboardData.value.categoryData || []
+  
+  return {
+    tooltip: {
+      trigger: 'item'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left'
+    },
+    series: [{
+      type: 'pie',
+      radius: '50%',
+      data: data.length > 0 ? data : [{ name: '暂无数据', value: 1 }],
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    }]
+  }
+})
+
+// 传播分析图表配置
+const propagationOption = computed(() => {
+  if (!showCharts.value) return {}
+  const dates = dashboardData.value.propagationData.dates || []
+  const counts = dashboardData.value.propagationData.counts || []
+  
+  return {
+    tooltip: {
+      trigger: 'axis'
+    },
+    xAxis: {
+      type: 'category',
+      data: dates.length > 0 ? dates : ['暂无数据'],
+      axisLabel: {
+        interval: 0,
+        rotate: 45
+      }
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1
+    },
+    series: [{
+      data: counts.length > 0 ? counts : [0],
+      type: 'line',
+      smooth: true,
+      name: '传播量',
+      itemStyle: {
+        color: '#9C27B0'
+      }
+    }]
+  }
 })
 </script>
 
@@ -233,41 +400,51 @@ onMounted(async () => {
 
 .dashboard-card {
   margin-bottom: 20px;
+  height: 120px;
 }
 
 .card-content {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
 .card-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
+  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .card-icon .el-icon {
-  font-size: 24px;
+  font-size: 20px;
   color: white;
 }
 
 .card-info {
   flex: 1;
+  overflow: hidden;
 }
 
 .card-value {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-title {
-  font-size: 14px;
+  font-size: 12px;
   color: #909399;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chart-row {
@@ -286,5 +463,14 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.no-data {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #909399;
+  font-size: 14px;
 }
 </style> 

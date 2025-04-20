@@ -78,6 +78,12 @@ const routes = [
         meta: { title: '溯源可视化' }
       },
       {
+        path: 'flow',
+        name: 'Flow',
+        component: () => import('@/views/FlowManager.vue'),
+        meta: { title: '工作流程' }
+      },
+      {
         path: 'profile',
         name: 'Profile',
         component: () => import('@/views/Profile.vue'),

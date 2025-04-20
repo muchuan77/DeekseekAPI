@@ -223,4 +223,29 @@ export default {
   display: flex;
   justify-content: flex-end;
 }
+
+/* 添加下拉框样式 */
+:deep(.el-select) {
+  width: 200px;
+}
+
+:deep(.el-select-dropdown__item) {
+  white-space: normal;
+  height: auto;
+  padding: 8px 10px;
+  line-height: 1.5;
+}
+
+:deep(.el-select-dropdown__item span) {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:deep(.el-select-dropdown__item.selected) {
+  color: #409EFF;
+  font-weight: bold;
+}
 </style> 

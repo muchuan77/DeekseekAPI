@@ -42,11 +42,18 @@ export const useLogStore = defineStore('log', () => {
     try {
       loading.value = true
       const response = await getOperationLogs(params)
-      if (response.code === 200) {
-        operationLogs.value = response.data.content
+      if (response && response.code === 200) {
+        operationLogs.value = response.data.content || []
+        return response.data
+      } else {
+        console.error('获取操作日志失败: 响应格式错误', response)
+        operationLogs.value = []
+        throw new Error('响应格式错误')
       }
     } catch (error) {
       console.error('获取操作日志失败:', error)
+      operationLogs.value = []
+      throw error
     } finally {
       loading.value = false
     }

@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia'
-import { systemApi } from '@/api/system'
+import { 
+  getSystemConfig,
+  updateSystemConfig,
+  getSystemStatus,
+  getSystemResources,
+  getSystemPerformance,
+  getSystemAlerts,
+  updateAlertStatus
+} from '@/api/system'
 import { ElMessage } from 'element-plus'
 
 export const useSystemStore = defineStore('system', {
@@ -24,7 +32,7 @@ export const useSystemStore = defineStore('system', {
     async fetchConfig() {
       try {
         this.loading = true
-        const response = await systemApi.getConfig()
+        const response = await getSystemConfig()
         if (response.code === 200) {
           this.config = response.data
         }
@@ -38,7 +46,7 @@ export const useSystemStore = defineStore('system', {
 
     async updateConfig(configData) {
       try {
-        const response = await systemApi.updateConfig(configData)
+        const response = await updateSystemConfig(configData)
         if (response.code === 200) {
           ElMessage.success('更新系统配置成功')
           return true
@@ -54,7 +62,7 @@ export const useSystemStore = defineStore('system', {
     async fetchStatus() {
       try {
         this.loading = true
-        const response = await systemApi.getStatus()
+        const response = await getSystemStatus()
         if (response.code === 200) {
           this.status = response.data
         }
@@ -69,7 +77,7 @@ export const useSystemStore = defineStore('system', {
     async fetchResources() {
       try {
         this.loading = true
-        const response = await systemApi.getResources()
+        const response = await getSystemResources()
         if (response.code === 200) {
           this.resources = response.data
         }
@@ -84,7 +92,7 @@ export const useSystemStore = defineStore('system', {
     async fetchPerformance() {
       try {
         this.loading = true
-        const response = await systemApi.getPerformance()
+        const response = await getSystemPerformance()
         if (response.code === 200) {
           this.performance = response.data
         }
@@ -99,7 +107,7 @@ export const useSystemStore = defineStore('system', {
     async fetchAlerts() {
       try {
         this.loading = true
-        const response = await systemApi.getAlerts()
+        const response = await getSystemAlerts()
         if (response.code === 200) {
           this.alerts = response.data
         }
@@ -113,7 +121,7 @@ export const useSystemStore = defineStore('system', {
 
     async updateAlertStatus(alertId, status) {
       try {
-        const response = await systemApi.updateAlertStatus(alertId, status)
+        const response = await updateAlertStatus(alertId, status)
         if (response.code === 200) {
           ElMessage.success('更新告警状态成功')
           return true

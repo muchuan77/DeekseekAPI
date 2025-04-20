@@ -9,14 +9,7 @@
 
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="评论内容" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态">
-            <el-option label="全部" value="" />
-            <el-option label="正常" value="active" />
-            <el-option label="已删除" value="deleted" />
-          </el-select>
+          <el-input v-model="searchForm.rumorId" placeholder="谣言ID" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -32,15 +25,15 @@
         <el-table-column prop="createTime" label="评论时间" width="180" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
-              {{ row.status === 'active' ? '正常' : '已删除' }}
+            <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'danger'">
+              {{ row.status === 'ACTIVE' ? '正常' : '已删除' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="{ row }">
             <el-button
-              v-if="row.status === 'active'"
+              v-if="row.status === 'ACTIVE'"
               type="danger"
               link
               @click="handleDelete(row)"
@@ -74,119 +67,116 @@
   </div>
 </template>
 
-<script>
-import { ref, reactive, onMounted } from 'vue'
+<script setup>
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import axios from 'axios'
+import { useCommentStore } from '@/stores/comment'
+import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
-export default {
-  name: 'CommentManagement',
-  setup() {
-    const loading = ref(false)
-    const comments = ref([])
-    const currentPage = ref(1)
-    const pageSize = ref(10)
-    const total = ref(0)
+const authStore = useAuthStore()
+const commentStore = useCommentStore()
+const loading = ref(false)
+const currentPage = ref(1)
+const pageSize = ref(10)
 
-    const searchForm = reactive({
-      keyword: '',
-      status: ''
+const searchForm = reactive({
+  rumorId: '1',
+  page: 0,
+  size: 10
+})
+
+// 计算属性
+const comments = computed(() => commentStore.comments)
+const total = computed(() => commentStore.totalComments)
+
+const fetchComments = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: currentPage.value - 1,
+      size: pageSize.value,
+      rumorId: searchForm.rumorId || '1'
+    }
+    await commentStore.fetchComments(params)
+    if (comments.value.length === 0) {
+      ElMessage.info('暂无评论数据')
+    }
+  } catch (error) {
+    console.error('获取评论列表失败:', error)
+    if (error.response?.status === 401) {
+      authStore.clearAuth()
+      router.push('/login')
+    } else {
+      ElMessage.error('获取评论列表失败')
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchComments()
+}
+
+const resetSearch = () => {
+  searchForm.rumorId = ''
+  handleSearch()
+}
+
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  fetchComments()
+}
+
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+  fetchComments()
+}
+
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该评论吗？', '提示', {
+      type: 'warning'
     })
-
-    const fetchComments = async () => {
-      loading.value = true
-      try {
-        const response = await axios.get('/api/comments', {
-          params: {
-            page: currentPage.value - 1,
-            size: pageSize.value,
-            keyword: searchForm.keyword,
-            status: searchForm.status
-          }
-        })
-        comments.value = response.data.data.content
-        total.value = response.data.data.totalElements
-      } catch (error) {
-        ElMessage.error('获取评论列表失败')
-        console.error(error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const handleSearch = () => {
-      currentPage.value = 1
-      fetchComments()
-    }
-
-    const resetSearch = () => {
-      searchForm.keyword = ''
-      searchForm.status = ''
-      handleSearch()
-    }
-
-    const handleSizeChange = (val) => {
-      pageSize.value = val
-      fetchComments()
-    }
-
-    const handleCurrentChange = (val) => {
-      currentPage.value = val
-      fetchComments()
-    }
-
-    const handleDelete = async (row) => {
-      try {
-        await ElMessageBox.confirm('确定要删除该评论吗？', '提示', {
-          type: 'warning'
-        })
-        await axios.delete(`/api/comments/${row.id}`)
-        ElMessage.success('删除成功')
-        fetchComments()
-      } catch (error) {
-        if (error !== 'cancel') {
-          ElMessage.error('删除失败')
-          console.error(error)
-        }
-      }
-    }
-
-    const handleRestore = async (row) => {
-      try {
-        await ElMessageBox.confirm('确定要恢复该评论吗？', '提示', {
-          type: 'warning'
-        })
-        await axios.put(`/api/comments/${row.id}/restore`)
-        ElMessage.success('恢复成功')
-        fetchComments()
-      } catch (error) {
-        if (error !== 'cancel') {
-          ElMessage.error('恢复失败')
-          console.error(error)
-        }
-      }
-    }
-
-    onMounted(() => {
-      fetchComments()
-    })
-
-    return {
-      loading,
-      comments,
-      currentPage,
-      pageSize,
-      total,
-      searchForm,
-      handleSearch,
-      resetSearch,
-      handleSizeChange,
-      handleCurrentChange,
-      handleDelete,
-      handleRestore
+    await commentStore.deleteComment(row.id)
+    ElMessage.success('删除成功')
+    fetchComments()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+      console.error(error)
     }
   }
 }
+
+const handleRestore = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要恢复该评论吗？', '提示', {
+      type: 'warning'
+    })
+    await commentStore.updateComment(row.id, { status: 'ACTIVE' })
+    ElMessage.success('恢复成功')
+    fetchComments()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('恢复失败')
+      console.error(error)
+    }
+  }
+}
+
+onMounted(() => {
+  // 检查用户是否已登录
+  if (!authStore.token) {
+    ElMessage.error('请先登录')
+    router.push('/login')
+    return
+  }
+  
+  fetchComments()
+})
 </script>
 
 <style scoped>

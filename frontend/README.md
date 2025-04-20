@@ -1,16 +1,18 @@
 # 谣言溯源系统前端
 
-基于 Vue.js 构建的谣言溯源系统前端应用。
+基于 Vue.js 3 构建的谣言溯源系统前端应用。
 
 ## 项目概述
 
-前端使用 Vue.js 框架构建，具有以下主要特性：
-- Vue 3 + Composition API
-- Vue Router 用于导航
-- Pinia 用于状态管理
-- Axios 用于 API 请求
-- Element Plus 用于 UI 组件
-- Vite 用于构建工具
+前端使用 Vue.js 3 框架构建，具有以下主要特性：
+- Vue 3.3.11 + Composition API
+- Vue Router 4.2.5 用于导航
+- Pinia 2.1.7 用于状态管理
+- Axios 1.6.2 用于 API 请求
+- Element Plus 2.4.4 用于 UI 组件
+- Vite 6.3.0 用于构建工具
+- ECharts 5.6.0 用于数据可视化
+- SASS 1.69.5 用于样式管理
 
 ## 目录结构
 
@@ -27,8 +29,7 @@ frontend/
 │   │   ├── permission.js  # 权限管理 API
 │   │   ├── log.js         # 日志管理 API
 │   │   ├── propagation.js # 传播分析 API
-│   │   ├── ai.js          # AI分析 API
-│   │   └── analytics.js   # 分析统计 API
+│   │   └── ai.js          # AI分析 API
 │   ├── assets/            # 静态资源（图片、样式等）
 │   ├── layouts/           # 布局组件
 │   ├── router/            # Vue Router 配置
@@ -43,9 +44,7 @@ frontend/
 │   │   ├── settings.js    # 设置状态
 │   │   ├── log.js         # 日志状态
 │   │   ├── propagation.js # 传播分析状态
-│   │   ├── ai.js          # AI分析状态
-│   │   ├── analytics.js   # 分析统计状态
-│   │   └── dashboard.js   # 仪表盘状态
+│   │   └── ai.js          # AI分析状态
 │   ├── utils/             # 工具函数
 │   ├── views/             # 页面组件
 │   │   ├── admin/         # 管理后台页面
@@ -74,6 +73,7 @@ frontend/
 │   │   ├── AI.vue         # AI分析页面
 │   │   ├── LogVisualization.vue # 日志可视化页面
 │   │   ├── SyncManagement.vue   # 同步管理页面
+│   │   ├── FlowManager.vue      # 流程管理页面
 │   │   └── AdminProfile.vue     # 管理员资料页面
 │   ├── App.vue            # 根组件
 │   └── main.js            # 应用入口文件
@@ -83,6 +83,8 @@ frontend/
 ├── .env.production        # 生产环境变量
 ├── vite.config.js         # Vite 配置
 ├── package.json           # 项目依赖
+├── .eslintrc.js          # ESLint 配置
+├── jest.config.js         # Jest 测试配置
 └── README.md              # 项目文档
 ```
 
@@ -142,6 +144,12 @@ frontend/
 - 视频分析
 - 分析结果展示
 - 多模态融合分析
+
+### 区块链存证
+- 数据上链管理
+- 存证查询
+- 区块链状态监控
+- 智能合约交互
 
 ## 页面关系说明
 
@@ -218,6 +226,16 @@ npm run dev
 npm run build
 ```
 
+4. 预览生产版本：
+```bash
+npm run preview
+```
+
+5. 代码检查：
+```bash
+npm run lint
+```
+
 ## 环境配置
 
 项目使用环境变量进行配置：
@@ -229,6 +247,17 @@ npm run build
 - `VITE_API_BASE_URL` - API 基础 URL
 - `VITE_APP_TITLE` - 应用标题
 - `VITE_APP_DESCRIPTION` - 应用描述
+- `VITE_APP_PORT` - 开发服务器端口
+- `VITE_APP_PROXY_TARGET` - API 代理目标
+
+## 构建配置
+
+项目使用 Vite 6.3.0 进行构建，主要配置：
+- 开发服务器端口：3000
+- API 代理：/api -> http://localhost:8080
+- 输出目录：dist
+- 资源目录：assets
+- 源码映射：启用
 
 ## 部署
 
@@ -237,7 +266,17 @@ npm run build
 npm run build
 ```
 
-2. 部署构建后的文件到 Web 服务器
+2. 部署构建后的文件到 Web 服务器：
+- 将 `dist` 目录下的文件复制到 Web 服务器
+- 配置 Web 服务器路由，确保所有请求都指向 `index.html`
+- 配置 API 代理，确保 API 请求正确转发
+
+## 测试
+
+项目使用 Jest 进行单元测试：
+```bash
+npm test
+```
 
 ## 注意事项
 
@@ -245,3 +284,7 @@ npm run build
 2. 检查环境变量配置是否正确
 3. 确保有正确的权限访问 API 服务
 4. 遵循项目的代码规范和提交规范
+5. 开发时注意跨域问题，已配置代理解决
+6. 生产环境部署时注意配置正确的 API 地址
+7. 使用 ESLint 进行代码规范检查
+8. 使用 SASS 进行样式管理，确保样式模块化
