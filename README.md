@@ -76,80 +76,95 @@
   - Grafana
 
 ### 架构图
+
+#### ① 主系统架构
 ```mermaid
-graph TB
-    %% 主系统架构
-    A[前端Vue.js] --> B[后端Spring Boot]
-    B --> C[MySQL数据库]
-    B --> D[Redis缓存]
-    B --> E[Elasticsearch]
-    B --> F[DeepSeek API]
-    B --> G[区块链网络 - 待完善]
-    E --> H[全文搜索 - 待完善]
-    F --> I[强化学习AI - 待完善]
+graph TD
+  direction TB
 
-    %% 前端架构
-    subgraph 前端架构
-        direction TB
-        A1[Vue.js] --> A2[Element Plus]
-        A1 --> A3[Pinia]
-        A1 --> A4[Vue Router]
-        A1 --> A5[Axios]
-        A1 --> A6[ECharts]
-    end
+  classDef front  fill:#f9f,stroke:#333,stroke-width:2px
+  classDef back   fill:#bbf,stroke:#333,stroke-width:2px
+  classDef ai     fill:#bfb,stroke:#333,stroke-width:2px
+  classDef store  fill:#fbb,stroke:#333,stroke-width:2px
+  classDef chain  fill:#ffd,stroke:#333,stroke-width:2px
 
-    %% 后端架构
-    subgraph 后端架构
-        direction TB
-        B1[Spring Boot] --> B2[Spring Security]
-        B1 --> B3[Spring Data JPA]
-        B1 --> B4[Spring Data Redis]
-        B1 --> B5[Spring Data Elasticsearch]
-        B1 --> B6[Spring Cloud OpenFeign]
-    end
+  FE[前端 Vue.js]:::front --> BE[后端 Spring Boot]:::back
+  BE --> DB[MySQL]:::store
+  BE --> Cache[Redis]:::store
+  BE --> Search[Elasticsearch]:::store
+  BE --> AI[DeepSeek API / RL]:::ai
+  BE --> BC[区块链网络]:::chain
+```
 
-    %% AI模型架构
-    subgraph AI模型架构
-        direction TB
-        I1[强化学习框架] --> I2[环境模拟器]
-        I1 --> I3[智能体]
-        I1 --> I4[奖励机制]
-        I1 --> I5[策略网络]
-        I1 --> I6[经验回放]
-        I2 --> I7[状态空间]
-        I2 --> I8[动作空间]
-        I3 --> I9[探索策略]
-        I3 --> I10[利用策略]
-    end
+#### ② 前端架构
+```mermaid
+graph TD
+  direction TB
+  classDef front fill:#f9f,stroke:#333,stroke-width:2px
 
-    %% 数据存储架构
-    subgraph 数据存储
-        direction TB
-        C1[MySQL] --> C2[用户数据]
-        C1 --> C3[谣言数据]
-        C1 --> C4[分析结果]
-        D1[Redis] --> D2[会话管理]
-        D1 --> D3[缓存数据]
-        E1[Elasticsearch] --> E2[全文索引]
-        E1 --> E3[搜索服务]
-    end
+  FE[Vue.js 3]:::front --> UI[Element Plus]:::front
+  FE --> State[Pinia]:::front
+  FE --> Router[Vue Router]:::front
+  FE --> HTTP[Axios]:::front
+  FE --> Chart[ECharts]:::front
+```
 
-    %% 添加间距和样式
-    style 前端架构 fill:#f9f,stroke:#333,stroke-width:2px
-    style 后端架构 fill:#bbf,stroke:#333,stroke-width:2px
-    style AI模型架构 fill:#bfb,stroke:#333,stroke-width:2px
-    style 数据存储 fill:#fbb,stroke:#333,stroke-width:2px
+#### ③ 后端架构
+```mermaid
+graph TD
+  direction TB
+  classDef back fill:#bbf,stroke:#333,stroke-width:2px
 
-    %% 主系统架构样式
-    style A fill:#fff,stroke:#333,stroke-width:2px
-    style B fill:#fff,stroke:#333,stroke-width:2px
-    style C fill:#fff,stroke:#333,stroke-width:2px
-    style D fill:#fff,stroke:#333,stroke-width:2px
-    style E fill:#fff,stroke:#333,stroke-width:2px
-    style F fill:#fff,stroke:#333,stroke-width:2px
-    style G fill:#fff,stroke:#333,stroke-width:2px
-    style H fill:#fff,stroke:#333,stroke-width:2px
-    style I fill:#fff,stroke:#333,stroke-width:2px
+  SB[Spring Boot]:::back --> Sec[Spring Security]:::back
+  SB --> JPA[Spring Data JPA]:::back
+  SB --> Rds[Spring Data Redis]:::back
+  SB --> ES[Spring Data Elasticsearch]:::back
+  SB --> Feign[Spring Cloud OpenFeign]:::back
+```
+
+
+#### ④ AI 模型架构
+```mermaid
+graph TD
+  direction TB
+  classDef ai fill:#bfb,stroke:#333,stroke-width:2px
+
+  RL[强化学习框架]:::ai --> Env[环境模拟器]:::ai
+  RL --> Agent[智能体]:::ai
+  RL --> Reward[奖励机制]:::ai
+  RL --> Policy[策略网络]:::ai
+  RL --> Replay[经验回放]:::ai
+  Env --> State[状态空间]:::ai
+  Env --> Action[动作空间]:::ai
+  Agent --> Explore[探索策略]:::ai
+  Agent --> Exploit[利用策略]:::ai
+```
+
+
+#### ⑤ 数据存储架构
+```mermaid
+graph TD
+  direction TB
+  classDef store fill:#fbb,stroke:#333,stroke-width:2px
+
+  MySQL[MySQL]:::store --> U[用户数据]:::store
+  MySQL --> R[谣言数据]:::store
+  MySQL --> A[分析结果]:::store
+  Redis[Redis]:::store --> Sess[会话管理]:::store
+  Redis --> Cache[缓存数据]:::store
+  ES[Elasticsearch]:::store --> Idx[全文索引]:::store
+  ES --> Srch[搜索服务]:::store
+```
+
+#### ⑥ 区块链架构（待完善）
+```mermaid
+graph TD
+  direction TB
+  classDef chain fill:#ffd,stroke:#333,stroke-width:2px
+
+  Gateway[Fabric Gateway]:::chain --> Contract[智能合约]:::chain
+  Contract --> Ledger[分布式账本]:::chain
+  Ledger --> CA[证书管理]:::chain
 ```
 
 ## 项目状态
