@@ -77,7 +77,7 @@
 
 ### 架构图
 ```mermaid
-graph TD
+graph TB
     A[前端Vue.js] --> B[后端Spring Boot]
     B --> C[MySQL数据库]
     B --> D[Redis缓存]
@@ -88,6 +88,7 @@ graph TD
     F --> I[强化学习AI - 待完善]
     
     subgraph 前端架构
+        direction TB
         A1[Vue.js] --> A2[Element Plus]
         A1 --> A3[Pinia]
         A1 --> A4[Vue Router]
@@ -96,6 +97,7 @@ graph TD
     end
     
     subgraph 后端架构
+        direction TB
         B1[Spring Boot] --> B2[Spring Security]
         B1 --> B3[Spring Data JPA]
         B1 --> B4[Spring Data Redis]
@@ -104,6 +106,7 @@ graph TD
     end
     
     subgraph AI模型架构
+        direction TB
         I1[强化学习框架] --> I2[环境模拟器]
         I1 --> I3[智能体]
         I1 --> I4[奖励机制]
@@ -116,6 +119,7 @@ graph TD
     end
     
     subgraph 数据存储
+        direction TB
         C1[MySQL] --> C2[用户数据]
         C1 --> C3[谣言数据]
         C1 --> C4[分析结果]
