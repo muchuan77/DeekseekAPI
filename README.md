@@ -78,6 +78,7 @@
 ### 架构图
 ```mermaid
 graph TB
+    %% 主系统架构
     A[前端Vue.js] --> B[后端Spring Boot]
     B --> C[MySQL数据库]
     B --> D[Redis缓存]
@@ -86,7 +87,8 @@ graph TB
     B --> G[区块链网络 - 待完善]
     E --> H[全文搜索 - 待完善]
     F --> I[强化学习AI - 待完善]
-    
+
+    %% 前端架构
     subgraph 前端架构
         direction TB
         A1[Vue.js] --> A2[Element Plus]
@@ -95,7 +97,8 @@ graph TB
         A1 --> A5[Axios]
         A1 --> A6[ECharts]
     end
-    
+
+    %% 后端架构
     subgraph 后端架构
         direction TB
         B1[Spring Boot] --> B2[Spring Security]
@@ -104,7 +107,8 @@ graph TB
         B1 --> B5[Spring Data Elasticsearch]
         B1 --> B6[Spring Cloud OpenFeign]
     end
-    
+
+    %% AI模型架构
     subgraph AI模型架构
         direction TB
         I1[强化学习框架] --> I2[环境模拟器]
@@ -117,7 +121,8 @@ graph TB
         I3 --> I9[探索策略]
         I3 --> I10[利用策略]
     end
-    
+
+    %% 数据存储架构
     subgraph 数据存储
         direction TB
         C1[MySQL] --> C2[用户数据]
@@ -128,6 +133,23 @@ graph TB
         E1[Elasticsearch] --> E2[全文索引]
         E1 --> E3[搜索服务]
     end
+
+    %% 添加间距和样式
+    style 前端架构 fill:#f9f,stroke:#333,stroke-width:2px
+    style 后端架构 fill:#bbf,stroke:#333,stroke-width:2px
+    style AI模型架构 fill:#bfb,stroke:#333,stroke-width:2px
+    style 数据存储 fill:#fbb,stroke:#333,stroke-width:2px
+
+    %% 主系统架构样式
+    style A fill:#fff,stroke:#333,stroke-width:2px
+    style B fill:#fff,stroke:#333,stroke-width:2px
+    style C fill:#fff,stroke:#333,stroke-width:2px
+    style D fill:#fff,stroke:#333,stroke-width:2px
+    style E fill:#fff,stroke:#333,stroke-width:2px
+    style F fill:#fff,stroke:#333,stroke-width:2px
+    style G fill:#fff,stroke:#333,stroke-width:2px
+    style H fill:#fff,stroke:#333,stroke-width:2px
+    style I fill:#fff,stroke:#333,stroke-width:2px
 ```
 
 ## 项目状态
