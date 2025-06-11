@@ -66,3 +66,40 @@ jobs:
       run: |
         cd backend
         mvn org.owasp:dependency-check-maven:check 
+
+    - name: Run Backend Coverage
+      run: |
+        cd backend
+        mvn test
+        mvn jacoco:report
+    - name: Upload Backend Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: backend/target/site/jacoco/jacoco.xml
+        flags: backend
+        name: backend-coverage
+        fail_ci_if_error: true
+
+    - name: Run Frontend Coverage
+      run: |
+        cd frontend
+        npm run test:coverage
+    - name: Upload Frontend Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+        fail_ci_if_error: true
+
+    - name: Run AI Model Coverage
+      run: |
+        cd ai-model
+        pytest --cov=. --cov-report=xml
+    - name: Upload AI Model Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ai-model/coverage.xml
+        flags: ai-model
+        name: ai-model-coverage
+        fail_ci_if_error: true 

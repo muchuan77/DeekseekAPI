@@ -1,0 +1,4 @@
+# 覆盖率报告
+.coverage
+coverage.xml
+htmlcov/ 
