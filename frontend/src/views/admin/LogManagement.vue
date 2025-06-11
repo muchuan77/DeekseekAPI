@@ -8,17 +8,44 @@
       </template>
 
       <!-- 搜索栏 -->
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="操作人">
-          <el-input v-model="searchForm.username" placeholder="请输入操作人" clearable />
+          <el-input
+            v-model="searchForm.username"
+            placeholder="请输入操作人"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="操作类型">
-          <el-select v-model="searchForm.operationType" placeholder="请选择操作类型" clearable>
-            <el-option label="登录" value="LOGIN" />
-            <el-option label="登出" value="LOGOUT" />
-            <el-option label="创建" value="CREATE" />
-            <el-option label="更新" value="UPDATE" />
-            <el-option label="删除" value="DELETE" />
+          <el-select
+            v-model="searchForm.operationType"
+            placeholder="请选择操作类型"
+            clearable
+          >
+            <el-option
+              label="登录"
+              value="LOGIN"
+            />
+            <el-option
+              label="登出"
+              value="LOGOUT"
+            />
+            <el-option
+              label="创建"
+              value="CREATE"
+            />
+            <el-option
+              label="更新"
+              value="UPDATE"
+            />
+            <el-option
+              label="删除"
+              value="DELETE"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
@@ -32,8 +59,15 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
 
@@ -44,21 +78,53 @@
         border
         style="width: 100%"
       >
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="username" label="操作人" width="120" />
-        <el-table-column prop="operationType" label="操作类型" width="120">
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="80"
+        />
+        <el-table-column
+          prop="username"
+          label="操作人"
+          width="120"
+        />
+        <el-table-column
+          prop="operationType"
+          label="操作类型"
+          width="120"
+        >
           <template #default="{ row }">
             <el-tag :type="getOperationTypeTag(row.operationType)">
               {{ getOperationTypeText(row.operationType) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="operationDesc" label="操作描述" min-width="200" />
-        <el-table-column prop="ip" label="IP地址" width="150" />
-        <el-table-column prop="createTime" label="操作时间" width="180" />
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column
+          prop="operationDesc"
+          label="操作描述"
+          min-width="200"
+        />
+        <el-table-column
+          prop="ip"
+          label="IP地址"
+          width="150"
+        />
+        <el-table-column
+          prop="createTime"
+          label="操作时间"
+          width="180"
+        />
+        <el-table-column
+          label="操作"
+          width="120"
+          fixed="right"
+        >
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleViewDetail(row)">
+            <el-button
+              type="primary"
+              link
+              @click="handleViewDetail(row)"
+            >
               查看详情
             </el-button>
           </template>
@@ -85,17 +151,30 @@
       title="日志详情"
       width="50%"
     >
-      <el-descriptions :column="1" border>
-        <el-descriptions-item label="ID">{{ currentLog.id }}</el-descriptions-item>
-        <el-descriptions-item label="操作人">{{ currentLog.username }}</el-descriptions-item>
+      <el-descriptions
+        :column="1"
+        border
+      >
+        <el-descriptions-item label="ID">
+          {{ currentLog.id }}
+        </el-descriptions-item>
+        <el-descriptions-item label="操作人">
+          {{ currentLog.username }}
+        </el-descriptions-item>
         <el-descriptions-item label="操作类型">
           <el-tag :type="getOperationTypeTag(currentLog.operationType)">
             {{ getOperationTypeText(currentLog.operationType) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="操作描述">{{ currentLog.operationDesc }}</el-descriptions-item>
-        <el-descriptions-item label="IP地址">{{ currentLog.ip }}</el-descriptions-item>
-        <el-descriptions-item label="操作时间">{{ currentLog.createTime }}</el-descriptions-item>
+        <el-descriptions-item label="操作描述">
+          {{ currentLog.operationDesc }}
+        </el-descriptions-item>
+        <el-descriptions-item label="IP地址">
+          {{ currentLog.ip }}
+        </el-descriptions-item>
+        <el-descriptions-item label="操作时间">
+          {{ currentLog.createTime }}
+        </el-descriptions-item>
         <el-descriptions-item label="请求参数">
           <pre>{{ formatJson(currentLog.requestParams) }}</pre>
         </el-descriptions-item>

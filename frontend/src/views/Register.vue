@@ -1,74 +1,124 @@
 <template>
-    <div class="register-container">
-      <el-card class="register-card">
-        <template #header>
-          <div class="card-header">
-            <span>用户注册</span>
-          </div>
-        </template>
+  <div class="register-container">
+    <el-card class="register-card">
+      <template #header>
+        <div class="card-header">
+          <span>用户注册</span>
+        </div>
+      </template>
   
-        <el-form
-          ref="formRef"
-          :model="registerForm"
-          :rules="rules"
-          label-width="80px"
+      <el-form
+        ref="formRef"
+        :model="registerForm"
+        :rules="rules"
+        label-width="80px"
+      >
+        <el-form-item
+          label="用户名"
+          prop="username"
         >
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="registerForm.username" placeholder="请输入用户名" />
-          </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input
-              v-model="registerForm.password"
-              type="password"
-              placeholder="请输入密码"
-              show-password
-            />
-          </el-form-item>
-          <el-form-item label="确认密码" prop="confirmPassword">
-            <el-input
-              v-model="registerForm.confirmPassword"
-              type="password"
-              placeholder="请再次输入密码"
-              show-password
-            />
-          </el-form-item>
-          <el-form-item label="姓名" prop="fullName">
-            <el-input v-model="registerForm.fullName" placeholder="请输入姓名" />
-          </el-form-item>
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="registerForm.email" placeholder="请输入邮箱" />
-          </el-form-item>
-          <el-form-item label="电话" prop="phone">
-            <el-input v-model="registerForm.phone" placeholder="请输入电话号码" maxlength="10" />
-          </el-form-item>
-          <el-form-item label="管理员密码" prop="adminPassword">
-            <el-input 
-              v-model="registerForm.adminPassword" 
-              type="password" 
-              placeholder="输入管理员密码以选择角色"
-            />
-          </el-form-item>
-          <el-form-item v-if="showRoleSelection" label="角色">
-            <el-radio-group v-model="registerForm.roles[0]">
-              <el-radio label="ADMIN">管理员</el-radio>
-              <el-radio label="MODERATOR">审核员</el-radio>
-              <el-radio label="USER">普通用户</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="handleRegister" :loading="loading" style="width: 100%">
-              注册
-            </el-button>
-          </el-form-item>
-          <el-form-item>
-            <div class="login-link">
-              已有账号？<router-link to="/login">立即登录</router-link>
-            </div>
-          </el-form-item>
-        </el-form>
-      </el-card>
-    </div>
-  </template>
+          <el-input
+            v-model="registerForm.username"
+            placeholder="请输入用户名"
+          />
+        </el-form-item>
+        <el-form-item
+          label="密码"
+          prop="password"
+        >
+          <el-input
+            v-model="registerForm.password"
+            type="password"
+            placeholder="请输入密码"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item
+          label="确认密码"
+          prop="confirmPassword"
+        >
+          <el-input
+            v-model="registerForm.confirmPassword"
+            type="password"
+            placeholder="请再次输入密码"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item
+          label="姓名"
+          prop="fullName"
+        >
+          <el-input
+            v-model="registerForm.fullName"
+            placeholder="请输入姓名"
+          />
+        </el-form-item>
+        <el-form-item
+          label="邮箱"
+          prop="email"
+        >
+          <el-input
+            v-model="registerForm.email"
+            placeholder="请输入邮箱"
+          />
+        </el-form-item>
+        <el-form-item
+          label="电话"
+          prop="phone"
+        >
+          <el-input
+            v-model="registerForm.phone"
+            placeholder="请输入电话号码"
+            maxlength="10"
+          />
+        </el-form-item>
+        <el-form-item
+          label="管理员密码"
+          prop="adminPassword"
+        >
+          <el-input 
+            v-model="registerForm.adminPassword" 
+            type="password" 
+            placeholder="输入管理员密码以选择角色"
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="showRoleSelection"
+          label="角色"
+        >
+          <el-radio-group v-model="registerForm.roles[0]">
+            <el-radio label="ADMIN">
+              管理员
+            </el-radio>
+            <el-radio label="MODERATOR">
+              审核员
+            </el-radio>
+            <el-radio label="USER">
+              普通用户
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            :loading="loading"
+            style="width: 100%"
+            @click="handleRegister"
+          >
+            注册
+          </el-button>
+        </el-form-item>
+        <el-form-item>
+          <div class="login-link">
+            已有账号？<router-link to="/login">
+              立即登录
+            </router-link>
+          </div>
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </div>
+</template>
   
   <script setup>
   import { ref, computed } from 'vue'

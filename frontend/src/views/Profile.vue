@@ -14,11 +14,21 @@
         label-width="100px"
       >
         <el-form-item label="用户ID">
-          <el-input v-model="profileForm.userId" disabled />
+          <el-input
+            v-model="profileForm.userId"
+            disabled
+          />
         </el-form-item>
 
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="profileForm.username" placeholder="请输入用户名" :disabled="!isAdmin">
+        <el-form-item
+          label="用户名"
+          prop="username"
+        >
+          <el-input
+            v-model="profileForm.username"
+            placeholder="请输入用户名"
+            :disabled="!isAdmin"
+          >
             <template #prefix>
               <span class="current-value">{{ profileForm.username }}</span>
             </template>
@@ -34,24 +44,42 @@
           </el-tag>
         </el-form-item>
         
-        <el-form-item label="姓名" prop="fullName">
-          <el-input v-model="profileForm.fullName" placeholder="请输入姓名">
+        <el-form-item
+          label="姓名"
+          prop="fullName"
+        >
+          <el-input
+            v-model="profileForm.fullName"
+            placeholder="请输入姓名"
+          >
             <template #prefix>
               <span class="current-value">{{ profileForm.fullName || '未设置' }}</span>
             </template>
           </el-input>
         </el-form-item>
         
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="profileForm.email" placeholder="请输入邮箱">
+        <el-form-item
+          label="邮箱"
+          prop="email"
+        >
+          <el-input
+            v-model="profileForm.email"
+            placeholder="请输入邮箱"
+          >
             <template #prefix>
               <span class="current-value">{{ profileForm.email || '未设置' }}</span>
             </template>
           </el-input>
         </el-form-item>
 
-        <el-form-item label="手机号码" prop="phoneNumber">
-          <el-input v-model="profileForm.phoneNumber" placeholder="请输入手机号码">
+        <el-form-item
+          label="手机号码"
+          prop="phoneNumber"
+        >
+          <el-input
+            v-model="profileForm.phoneNumber"
+            placeholder="请输入手机号码"
+          >
             <template #prefix>
               <span class="current-value">{{ profileForm.phoneNumber || '未设置' }}</span>
             </template>
@@ -74,7 +102,10 @@
             </el-select>
           </template>
           <template v-else>
-            <el-input v-model="profileForm.status" disabled>
+            <el-input
+              v-model="profileForm.status"
+              disabled
+            >
               <template #prefix>
                 <span class="current-value">{{ getStatusText(profileForm.status) }}</span>
               </template>
@@ -83,7 +114,10 @@
         </el-form-item>
 
         <el-form-item label="最后登录时间">
-          <el-input v-model="profileForm.lastLogin" :disabled="!isAdmin">
+          <el-input
+            v-model="profileForm.lastLogin"
+            :disabled="!isAdmin"
+          >
             <template #prefix>
               <span class="current-value">{{ formatDateTime(profileForm.lastLogin) }}</span>
             </template>
@@ -91,7 +125,10 @@
         </el-form-item>
 
         <el-form-item label="创建时间">
-          <el-input v-model="profileForm.createdAt" disabled>
+          <el-input
+            v-model="profileForm.createdAt"
+            disabled
+          >
             <template #prefix>
               <span class="current-value">{{ formatDateTime(profileForm.createdAt) }}</span>
             </template>
@@ -99,7 +136,10 @@
         </el-form-item>
 
         <el-form-item label="登录尝试次数">
-          <el-input v-model="profileForm.loginAttempts" :disabled="!isAdmin">
+          <el-input
+            v-model="profileForm.loginAttempts"
+            :disabled="!isAdmin"
+          >
             <template #prefix>
               <span class="current-value">{{ profileForm.loginAttempts }}</span>
             </template>
@@ -107,7 +147,10 @@
         </el-form-item>
 
         <el-form-item label="账户锁定时间">
-          <el-input v-model="profileForm.accountLockedUntil" :disabled="!isAdmin">
+          <el-input
+            v-model="profileForm.accountLockedUntil"
+            :disabled="!isAdmin"
+          >
             <template #prefix>
               <span class="current-value">{{ formatDateTime(profileForm.accountLockedUntil) }}</span>
             </template>
@@ -115,11 +158,22 @@
         </el-form-item>
 
         <el-form-item label="修改密码">
-          <el-button type="link" @click="showPasswordDialog">修改密码</el-button>
+          <el-button
+            type="link"
+            @click="showPasswordDialog"
+          >
+            修改密码
+          </el-button>
         </el-form-item>
         
         <el-form-item>
-          <el-button type="primary" @click="handleSave" :loading="loading">保存</el-button>
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="handleSave"
+          >
+            保存
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -136,7 +190,10 @@
         :rules="passwordRules"
         label-width="100px"
       >
-        <el-form-item label="当前密码" prop="oldPassword">
+        <el-form-item
+          label="当前密码"
+          prop="oldPassword"
+        >
           <el-input
             v-model="passwordForm.oldPassword"
             type="password"
@@ -144,7 +201,10 @@
             show-password
           />
         </el-form-item>
-        <el-form-item label="新密码" prop="newPassword">
+        <el-form-item
+          label="新密码"
+          prop="newPassword"
+        >
           <el-input
             v-model="passwordForm.newPassword"
             type="password"
@@ -152,7 +212,10 @@
             show-password
           />
         </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
+        <el-form-item
+          label="确认密码"
+          prop="confirmPassword"
+        >
           <el-input
             v-model="passwordForm.confirmPassword"
             type="password"
@@ -164,7 +227,11 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="passwordDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handlePasswordChange" :loading="passwordLoading">
+          <el-button
+            type="primary"
+            :loading="passwordLoading"
+            @click="handlePasswordChange"
+          >
             确定
           </el-button>
         </span>

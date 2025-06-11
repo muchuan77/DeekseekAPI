@@ -2,7 +2,10 @@
   <el-container class="layout-container">
     <el-aside width="200px">
       <div class="logo">
-        <img src="@/assets/logo.png" alt="Logo">
+        <img
+          src="@/assets/logo.png"
+          alt="Logo"
+        >
         <span>谣言追踪系统</span>
       </div>
       <el-menu
@@ -47,7 +50,10 @@
             <el-icon><User /></el-icon>
             <span>个人信息</span>
           </el-menu-item>
-          <el-menu-item v-if="hasRole('ADMIN') || hasRole('MODERATOR')" index="/admin/dashboard">
+          <el-menu-item
+            v-if="hasRole('ADMIN') || hasRole('MODERATOR')"
+            index="/admin/dashboard"
+          >
             <el-icon><Setting /></el-icon>
             <span>管理后台</span>
           </el-menu-item>
@@ -59,12 +65,19 @@
       <el-header>
         <div class="header-left">
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/' }">
+              首页
+            </el-breadcrumb-item>
             <el-breadcrumb-item>{{ currentRoute }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="header-right">
-          <el-button v-if="isVisitor" type="primary" link @click="goToLogin">
+          <el-button
+            v-if="isVisitor"
+            type="primary"
+            link
+            @click="goToLogin"
+          >
             登录
           </el-button>
           <el-dropdown v-else>
@@ -74,8 +87,12 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="handleProfile">个人信息</el-dropdown-item>
-                <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                <el-dropdown-item @click="handleProfile">
+                  个人信息
+                </el-dropdown-item>
+                <el-dropdown-item @click="handleLogout">
+                  退出登录
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>

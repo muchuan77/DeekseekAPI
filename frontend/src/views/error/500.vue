@@ -7,8 +7,15 @@
         sub-title="服务器内部错误，请稍后再试"
       >
         <template #extra>
-          <el-button type="primary" @click="goHome">返回首页</el-button>
-          <el-button @click="refresh">刷新页面</el-button>
+          <el-button
+            type="primary"
+            @click="goHome"
+          >
+            返回首页
+          </el-button>
+          <el-button @click="refresh">
+            刷新页面
+          </el-button>
         </template>
       </el-result>
     </div>

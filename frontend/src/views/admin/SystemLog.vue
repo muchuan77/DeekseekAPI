@@ -7,13 +7,32 @@
         </div>
       </template>
 
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="日志级别">
-          <el-select v-model="searchForm.level" placeholder="请选择日志级别">
-            <el-option label="全部" value="" />
-            <el-option label="INFO" value="INFO" />
-            <el-option label="WARN" value="WARN" />
-            <el-option label="ERROR" value="ERROR" />
+          <el-select
+            v-model="searchForm.level"
+            placeholder="请选择日志级别"
+          >
+            <el-option
+              label="全部"
+              value=""
+            />
+            <el-option
+              label="INFO"
+              value="INFO"
+            />
+            <el-option
+              label="WARN"
+              value="WARN"
+            />
+            <el-option
+              label="ERROR"
+              value="ERROR"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
@@ -27,27 +46,58 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
 
-      <el-table :data="logs" style="width: 100%" v-loading="loading">
-        <el-table-column prop="timestamp" label="时间" width="180">
+      <el-table
+        v-loading="loading"
+        :data="logs"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="timestamp"
+          label="时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.timestamp) }}
           </template>
         </el-table-column>
-        <el-table-column prop="level" label="级别" width="100">
+        <el-table-column
+          prop="level"
+          label="级别"
+          width="100"
+        >
           <template #default="{ row }">
             <el-tag :type="getLevelType(row.level)">
               {{ row.level }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="logger" label="来源" width="200" />
-        <el-table-column prop="message" label="内容" />
-        <el-table-column prop="exception" label="异常信息" width="200" show-overflow-tooltip />
+        <el-table-column
+          prop="logger"
+          label="来源"
+          width="200"
+        />
+        <el-table-column
+          prop="message"
+          label="内容"
+        />
+        <el-table-column
+          prop="exception"
+          label="异常信息"
+          width="200"
+          show-overflow-tooltip
+        />
       </el-table>
 
       <div class="pagination">

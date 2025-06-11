@@ -7,7 +7,10 @@
         </div>
       </template>
       
-      <el-form :model="settings" label-width="120px">
+      <el-form
+        :model="settings"
+        label-width="120px"
+      >
         <el-form-item label="系统名称">
           <el-input v-model="settings.systemName" />
         </el-form-item>
@@ -27,8 +30,17 @@
             :show-file-list="false"
             :on-success="handleLogoSuccess"
           >
-            <img v-if="settings.logo" :src="settings.logo" class="avatar" />
-            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            <img
+              v-if="settings.logo"
+              :src="settings.logo"
+              class="avatar"
+            >
+            <el-icon
+              v-else
+              class="avatar-uploader-icon"
+            >
+              <Plus />
+            </el-icon>
           </el-upload>
         </el-form-item>
         
@@ -41,7 +53,12 @@
         </el-form-item>
         
         <el-form-item>
-          <el-button type="primary" @click="saveSettings">保存设置</el-button>
+          <el-button
+            type="primary"
+            @click="saveSettings"
+          >
+            保存设置
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>

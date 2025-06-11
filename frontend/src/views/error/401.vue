@@ -7,7 +7,12 @@
         sub-title="您尚未登录或登录已过期，请重新登录"
       >
         <template #extra>
-          <el-button type="primary" @click="goLogin">去登录</el-button>
+          <el-button
+            type="primary"
+            @click="goLogin"
+          >
+            去登录
+          </el-button>
         </template>
       </el-result>
     </div>

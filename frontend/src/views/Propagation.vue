@@ -1,23 +1,38 @@
 <template>
   <div class="propagation-analysis">
-    <el-card class="box-card" v-loading="loading">
+    <el-card
+      v-loading="loading"
+      class="box-card"
+    >
       <template #header>
         <div class="card-header">
           <span>传播分析</span>
-          <el-button type="primary" @click="handleRefresh" :loading="refreshing">刷新</el-button>
+          <el-button
+            type="primary"
+            :loading="refreshing"
+            @click="handleRefresh"
+          >
+            刷新
+          </el-button>
         </div>
       </template>
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-card class="statistics-card" v-loading="loading">
+          <el-card
+            v-loading="loading"
+            class="statistics-card"
+          >
             <template #header>
               <div class="card-header">
                 <span>传播统计</span>
               </div>
             </template>
             <div v-if="statistics">
-              <el-descriptions :column="1" border>
+              <el-descriptions
+                :column="1"
+                border
+              >
                 <el-descriptions-item label="总传播路径数">
                   {{ statistics.totalPaths }}
                 </el-descriptions-item>
@@ -33,14 +48,20 @@
         </el-col>
 
         <el-col :span="12">
-          <el-card class="influence-card" v-loading="loading">
+          <el-card
+            v-loading="loading"
+            class="influence-card"
+          >
             <template #header>
               <div class="card-header">
                 <span>影响力分析</span>
               </div>
             </template>
             <div v-if="influence">
-              <el-descriptions :column="1" border>
+              <el-descriptions
+                :column="1"
+                border
+              >
                 <el-descriptions-item label="总影响力">
                   {{ influence.totalInfluence }}
                 </el-descriptions-item>
@@ -56,65 +77,143 @@
         </el-col>
       </el-row>
 
-      <el-row :gutter="20" style="margin-top: 20px">
+      <el-row
+        :gutter="20"
+        style="margin-top: 20px"
+      >
         <el-col :span="24">
-          <el-card class="paths-card" v-loading="loading">
+          <el-card
+            v-loading="loading"
+            class="paths-card"
+          >
             <template #header>
               <div class="card-header">
                 <span>传播路径</span>
-                <el-select v-model="pathType" placeholder="传播类型" style="width: 120px">
-                  <el-option label="全部" value="ALL" />
-                  <el-option label="直接传播" value="DIRECT" />
-                  <el-option label="间接传播" value="INDIRECT" />
+                <el-select
+                  v-model="pathType"
+                  placeholder="传播类型"
+                  style="width: 120px"
+                >
+                  <el-option
+                    label="全部"
+                    value="ALL"
+                  />
+                  <el-option
+                    label="直接传播"
+                    value="DIRECT"
+                  />
+                  <el-option
+                    label="间接传播"
+                    value="INDIRECT"
+                  />
                 </el-select>
               </div>
             </template>
             <div v-if="paths && paths.length > 0">
-              <el-table :data="paths" style="width: 100%">
-                <el-table-column prop="sourceNode" label="源节点" />
-                <el-table-column prop="targetNode" label="目标节点" />
-                <el-table-column prop="propagationTime" label="传播时间" />
-                <el-table-column prop="pathLength" label="路径长度" />
-                <el-table-column prop="type" label="传播类型" />
+              <el-table
+                :data="paths"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="sourceNode"
+                  label="源节点"
+                />
+                <el-table-column
+                  prop="targetNode"
+                  label="目标节点"
+                />
+                <el-table-column
+                  prop="propagationTime"
+                  label="传播时间"
+                />
+                <el-table-column
+                  prop="pathLength"
+                  label="路径长度"
+                />
+                <el-table-column
+                  prop="type"
+                  label="传播类型"
+                />
               </el-table>
             </div>
-            <el-empty v-else description="暂无传播路径数据" />
+            <el-empty
+              v-else
+              description="暂无传播路径数据"
+            />
           </el-card>
         </el-col>
       </el-row>
 
-      <el-row :gutter="20" style="margin-top: 20px">
+      <el-row
+        :gutter="20"
+        style="margin-top: 20px"
+      >
         <el-col :span="12">
-          <el-card class="key-nodes-card" v-loading="loading">
+          <el-card
+            v-loading="loading"
+            class="key-nodes-card"
+          >
             <template #header>
               <div class="card-header">
                 <span>关键节点</span>
               </div>
             </template>
             <div v-if="keyNodes && keyNodes.length > 0">
-              <el-table :data="keyNodes" style="width: 100%">
-                <el-table-column prop="nodeId" label="节点ID" />
-                <el-table-column prop="influence" label="影响力" />
-                <el-table-column prop="pathCount" label="路径数" />
+              <el-table
+                :data="keyNodes"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="nodeId"
+                  label="节点ID"
+                />
+                <el-table-column
+                  prop="influence"
+                  label="影响力"
+                />
+                <el-table-column
+                  prop="pathCount"
+                  label="路径数"
+                />
               </el-table>
             </div>
-            <el-empty v-else description="暂无关键节点数据" />
+            <el-empty
+              v-else
+              description="暂无关键节点数据"
+            />
           </el-card>
         </el-col>
 
         <el-col :span="12">
-          <el-card class="trends-card" v-loading="loading">
+          <el-card
+            v-loading="loading"
+            class="trends-card"
+          >
             <template #header>
               <div class="card-header">
                 <span>传播趋势</span>
-                <el-radio-group v-model="trendType" size="small">
-                  <el-radio-button label="hour">按小时</el-radio-button>
-                  <el-radio-button label="day">按天</el-radio-button>
+                <el-radio-group
+                  v-model="trendType"
+                  size="small"
+                >
+                  <el-radio-button label="hour">
+                    按小时
+                  </el-radio-button>
+                  <el-radio-button label="day">
+                    按天
+                  </el-radio-button>
                 </el-radio-group>
               </div>
             </template>
-            <div v-if="trends && trends.length > 0" class="trends-chart" ref="trendsChart"></div>
-            <el-empty v-else description="暂无传播趋势数据" />
+            <div
+              v-if="trends && trends.length > 0"
+              ref="trendsChart"
+              class="trends-chart"
+            />
+            <el-empty
+              v-else
+              description="暂无传播趋势数据"
+            />
           </el-card>
         </el-col>
       </el-row>

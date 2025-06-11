@@ -1,7 +1,11 @@
 <template>
   <div class="log-visualization">
     <el-card class="filter-card">
-      <el-form :inline="true" :model="filterForm" class="filter-form">
+      <el-form
+        :inline="true"
+        :model="filterForm"
+        class="filter-form"
+      >
         <el-form-item label="时间范围">
           <el-date-picker
             v-model="filterForm.dateRange"
@@ -13,24 +17,56 @@
           />
         </el-form-item>
         <el-form-item label="错误类型">
-          <el-select v-model="filterForm.errorType" placeholder="选择错误类型" @change="handleErrorTypeChange">
-            <el-option label="系统错误" value="system" />
-            <el-option label="业务错误" value="business" />
-            <el-option label="网络错误" value="network" />
+          <el-select
+            v-model="filterForm.errorType"
+            placeholder="选择错误类型"
+            @change="handleErrorTypeChange"
+          >
+            <el-option
+              label="系统错误"
+              value="system"
+            />
+            <el-option
+              label="业务错误"
+              value="business"
+            />
+            <el-option
+              label="网络错误"
+              value="network"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="服务名称">
-          <el-select v-model="filterForm.serviceName" placeholder="选择服务" @change="handleServiceChange">
-            <el-option label="认证服务" value="auth" />
-            <el-option label="日志服务" value="log" />
-            <el-option label="分析服务" value="analysis" />
-            <el-option label="检测服务" value="detection" />
+          <el-select
+            v-model="filterForm.serviceName"
+            placeholder="选择服务"
+            @change="handleServiceChange"
+          >
+            <el-option
+              label="认证服务"
+              value="auth"
+            />
+            <el-option
+              label="日志服务"
+              value="log"
+            />
+            <el-option
+              label="分析服务"
+              value="analysis"
+            />
+            <el-option
+              label="检测服务"
+              value="detection"
+            />
           </el-select>
         </el-form-item>
       </el-form>
     </el-card>
 
-    <el-row :gutter="20" class="chart-row">
+    <el-row
+      :gutter="20"
+      class="chart-row"
+    >
       <el-col :span="12">
         <el-card>
           <template #header>
@@ -39,7 +75,11 @@
             </div>
           </template>
           <div class="chart-container">
-            <v-chart class="chart" :option="userActivityOption" autoresize />
+            <v-chart
+              class="chart"
+              :option="userActivityOption"
+              autoresize
+            />
           </div>
         </el-card>
       </el-col>
@@ -51,13 +91,20 @@
             </div>
           </template>
           <div class="chart-container">
-            <v-chart class="chart" :option="operationTypeOption" autoresize />
+            <v-chart
+              class="chart"
+              :option="operationTypeOption"
+              autoresize
+            />
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" class="chart-row">
+    <el-row
+      :gutter="20"
+      class="chart-row"
+    >
       <el-col :span="12">
         <el-card>
           <template #header>
@@ -65,10 +112,24 @@
               <span>错误详情</span>
             </div>
           </template>
-          <el-table :data="logStore.errorDetails" style="width: 100%">
-            <el-table-column prop="timestamp" label="时间" width="180" />
-            <el-table-column prop="type" label="类型" width="120" />
-            <el-table-column prop="message" label="错误信息" />
+          <el-table
+            :data="logStore.errorDetails"
+            style="width: 100%"
+          >
+            <el-table-column
+              prop="timestamp"
+              label="时间"
+              width="180"
+            />
+            <el-table-column
+              prop="type"
+              label="类型"
+              width="120"
+            />
+            <el-table-column
+              prop="message"
+              label="错误信息"
+            />
           </el-table>
         </el-card>
       </el-col>
@@ -80,7 +141,11 @@
             </div>
           </template>
           <div class="chart-container">
-            <v-chart class="chart" :option="serviceHealthOption" autoresize />
+            <v-chart
+              class="chart"
+              :option="serviceHealthOption"
+              autoresize
+            />
           </div>
         </el-card>
       </el-col>

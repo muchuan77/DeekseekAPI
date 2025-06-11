@@ -7,19 +7,47 @@
         </div>
       </template>
 
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="操作类型">
-          <el-select v-model="searchForm.operationType" placeholder="请选择操作类型">
-            <el-option label="全部" value="" />
-            <el-option label="登录" value="LOGIN" />
-            <el-option label="登出" value="LOGOUT" />
-            <el-option label="创建" value="CREATE" />
-            <el-option label="更新" value="UPDATE" />
-            <el-option label="删除" value="DELETE" />
+          <el-select
+            v-model="searchForm.operationType"
+            placeholder="请选择操作类型"
+          >
+            <el-option
+              label="全部"
+              value=""
+            />
+            <el-option
+              label="登录"
+              value="LOGIN"
+            />
+            <el-option
+              label="登出"
+              value="LOGOUT"
+            />
+            <el-option
+              label="创建"
+              value="CREATE"
+            />
+            <el-option
+              label="更新"
+              value="UPDATE"
+            />
+            <el-option
+              label="删除"
+              value="DELETE"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="用户名">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名" />
+          <el-input
+            v-model="searchForm.username"
+            placeholder="请输入用户名"
+          />
         </el-form-item>
         <el-form-item label="时间范围">
           <el-date-picker
@@ -32,29 +60,67 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
 
-      <el-table :data="logs" style="width: 100%" v-loading="loading">
-        <el-table-column prop="timestamp" label="时间" width="180">
+      <el-table
+        v-loading="loading"
+        :data="logs"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="timestamp"
+          label="时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.timestamp) }}
           </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="operationType" label="操作类型" width="100">
+        <el-table-column
+          prop="username"
+          label="用户名"
+          width="120"
+        />
+        <el-table-column
+          prop="operationType"
+          label="操作类型"
+          width="100"
+        >
           <template #default="{ row }">
             <el-tag :type="getOperationType(row.operationType)">
               {{ getOperationTypeText(row.operationType) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="module" label="操作模块" width="120" />
-        <el-table-column prop="description" label="操作描述" />
-        <el-table-column prop="ip" label="IP地址" width="150" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column
+          prop="module"
+          label="操作模块"
+          width="120"
+        />
+        <el-table-column
+          prop="description"
+          label="操作描述"
+        />
+        <el-table-column
+          prop="ip"
+          label="IP地址"
+          width="150"
+        />
+        <el-table-column
+          prop="status"
+          label="状态"
+          width="100"
+        >
           <template #default="{ row }">
             <el-tag :type="row.status === 'SUCCESS' ? 'success' : 'danger'">
               {{ row.status === 'SUCCESS' ? '成功' : '失败' }}

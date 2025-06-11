@@ -4,19 +4,23 @@
 
 本后端服务是谣言溯源系统的核心组件，基于Spring Boot 2.7.12开发，集成了DeepSeek API、Elasticsearch、区块链等技术，提供谣言检测、传播追踪等核心功能。
 
-### 核心特性
-- 多模态谣言检测：支持文本、图片、视频等多种形式的内容分析
-- 智能传播追踪：基于图论和机器学习算法分析传播路径
-- 区块链存证：关键数据上链，确保数据不可篡改
-- 实时数据分析：提供多维度的数据统计和可视化
-- 权限管理：基于RBAC的细粒度权限控制
-- 软删除支持：所有实体支持软删除
-- 乐观锁支持：所有实体支持乐观锁
-- 审计日志：记录所有关键操作
-- 分布式缓存：使用Redis进行缓存管理
-- 全文搜索：使用Elasticsearch进行高效检索
-- 多环境配置：支持开发、测试、生产环境配置
-- Excel导出：支持数据导出为Excel格式
+### 🚀 核心特性
+- **多模态谣言检测**: 支持文本、图片、视频等多种形式的内容分析
+- **智能传播追踪**: 基于图论和机器学习算法分析传播路径
+- **区块链存证**: 关键数据上链，确保数据不可篡改
+- **实时数据分析**: 提供多维度的数据统计和可视化
+- **权限管理**: 基于RBAC的细粒度权限控制
+- **软删除支持**: 所有实体支持软删除
+- **乐观锁支持**: 所有实体支持乐观锁
+- **审计日志**: 记录所有关键操作
+- **分布式缓存**: 使用Redis进行缓存管理
+- **全文搜索**: 使用Elasticsearch进行高效检索
+- **多环境配置**: 支持开发、测试、生产环境配置
+- **Excel导出**: 支持数据导出为Excel格式
+- **监控指标**: Spring Boot Actuator集成Prometheus监控
+- **自动化测试**: 完整的单元测试和集成测试
+- **代码质量**: SonarCloud质量分析和JaCoCo覆盖率报告
+- **CI/CD集成**: GitHub Actions自动化构建和部署
 
 ## 技术架构
 
@@ -59,13 +63,24 @@
   - 情感分析
   - 可信度评估
 
-### 开发工具
-- Lombok：简化代码
-- MapStruct 1.5.3：对象映射
-- Maven：依赖管理
-- SpringDoc OpenAPI 1.7.0：API文档
-- Git：版本控制
-- Apache POI 5.2.3：Excel处理
+### 开发工具与监控
+- **代码工具**
+  - Lombok：简化代码
+  - MapStruct 1.5.3：对象映射
+  - Maven：依赖管理
+  - SpringDoc OpenAPI 1.7.0：API文档
+  - Apache POI 5.2.3：Excel处理
+- **监控与测试**
+  - Spring Boot Actuator：应用监控指标
+  - Micrometer：指标收集框架
+  - JaCoCo：代码覆盖率分析
+  - JUnit 5：单元测试框架
+  - Testcontainers：集成测试
+- **CI/CD工具**
+  - GitHub Actions：自动化CI/CD
+  - SonarCloud：代码质量分析
+  - Docker：容器化部署
+  - Maven Surefire：测试报告
 
 ## 系统要求
 
@@ -82,7 +97,7 @@
 - 区块链节点
 - 操作系统：Linux/Windows/macOS
 
-## 快速开始
+## 🚀 快速开始
 
 ### 1. 环境准备
 
@@ -120,12 +135,18 @@ spring:
     socket-timeout: 5000
 ```
 
-### 2. 编译项目
+### 2. 编译与测试
 ```bash
 # 清理并编译
 mvn clean install
 
-# 跳过测试
+# 运行单元测试
+mvn test
+
+# 生成代码覆盖率报告
+mvn clean test jacoco:report
+
+# 跳过测试快速构建
 mvn clean install -DskipTests
 ```
 
@@ -134,8 +155,29 @@ mvn clean install -DskipTests
 # 开发环境
 mvn spring-boot:run
 
+# 指定配置文件
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
 # 生产环境
 java -jar target/rumor-tracing-1.0.0.jar
+
+# 启用监控端点
+java -jar target/rumor-tracing-1.0.0.jar --management.endpoints.web.exposure.include=*
+```
+
+### 4. 监控检查
+```bash
+# 健康检查
+curl http://localhost:8080/actuator/health
+
+# 查看应用信息
+curl http://localhost:8080/actuator/info
+
+# 查看指标
+curl http://localhost:8080/actuator/metrics
+
+# Prometheus指标
+curl http://localhost:8080/actuator/prometheus
 ```
 
 ## 项目结构

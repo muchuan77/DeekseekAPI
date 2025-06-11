@@ -14,59 +14,143 @@
               :show-file-list="false"
               accept=".xlsx"
             >
-              <el-button type="primary">导入用户</el-button>
+              <el-button type="primary">
+                导入用户
+              </el-button>
             </el-upload>
-            <el-button type="success" @click="handleExport">导出用户</el-button>
-            <el-button type="primary" @click="handleAdd">添加用户</el-button>
+            <el-button
+              type="success"
+              @click="handleExport"
+            >
+              导出用户
+            </el-button>
+            <el-button
+              type="primary"
+              @click="handleAdd"
+            >
+              添加用户
+            </el-button>
           </div>
         </div>
       </template>
 
       <!-- 批量操作工具栏 -->
-      <div class="batch-actions" v-if="selectedUsers.length > 0">
+      <div
+        v-if="selectedUsers.length > 0"
+        class="batch-actions"
+      >
         <span>已选择 {{ selectedUsers.length }} 个用户</span>
-        <el-button type="primary" size="small" @click="handleBatchEnable">批量启用</el-button>
-        <el-button type="warning" size="small" @click="handleBatchDisable">批量禁用</el-button>
-        <el-button type="danger" size="small" @click="handleBatchDelete">批量删除</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          @click="handleBatchEnable"
+        >
+          批量启用
+        </el-button>
+        <el-button
+          type="warning"
+          size="small"
+          @click="handleBatchDisable"
+        >
+          批量禁用
+        </el-button>
+        <el-button
+          type="danger"
+          size="small"
+          @click="handleBatchDelete"
+        >
+          批量删除
+        </el-button>
       </div>
 
       <!-- 搜索表单 -->
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="用户名/姓名/邮箱" clearable />
+          <el-input
+            v-model="searchForm.keyword"
+            placeholder="用户名/姓名/邮箱"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
-            <el-option label="启用" value="ENABLED" />
-            <el-option label="禁用" value="DISABLED" />
+          <el-select
+            v-model="searchForm.status"
+            placeholder="请选择状态"
+            clearable
+          >
+            <el-option
+              label="启用"
+              value="ENABLED"
+            />
+            <el-option
+              label="禁用"
+              value="DISABLED"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
 
       <!-- 用户表格 -->
       <el-table 
+        v-loading="loading" 
         :data="users" 
-        style="width: 100%" 
-        v-loading="loading"
+        style="width: 100%"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="fullName" label="姓名" width="120" />
-        <el-table-column prop="email" label="邮箱" width="200" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column
+          type="selection"
+          width="55"
+        />
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="80"
+        />
+        <el-table-column
+          prop="username"
+          label="用户名"
+          width="120"
+        />
+        <el-table-column
+          prop="fullName"
+          label="姓名"
+          width="120"
+        />
+        <el-table-column
+          prop="email"
+          label="邮箱"
+          width="200"
+        />
+        <el-table-column
+          prop="status"
+          label="状态"
+          width="100"
+        >
           <template #default="{ row }">
             <el-tag :type="row.status === 'ENABLED' ? 'success' : 'danger'">
               {{ row.status === 'ENABLED' ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="角色" width="200">
+        <el-table-column
+          label="角色"
+          width="200"
+        >
           <template #default="{ row }">
             <el-tag 
               v-for="role in row.roles" 
@@ -78,17 +162,40 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="300">
+        <el-table-column
+          label="操作"
+          width="300"
+        >
           <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button type="warning" size="small" @click="handleEditRoles(row)">角色</el-button>
-            <el-button type="warning" size="small" @click="handleResetPassword(row)">重置密码</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              @click="handleEdit(row)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              type="warning"
+              size="small"
+              @click="handleEditRoles(row)"
+            >
+              角色
+            </el-button>
+            <el-button
+              type="warning"
+              size="small"
+              @click="handleResetPassword(row)"
+            >
+              重置密码
+            </el-button>
             <el-button 
               type="danger" 
               size="small" 
-              @click="handleDelete(row)"
               :disabled="row.id === currentUser.id"
-            >删除</el-button>
+              @click="handleDelete(row)"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -109,8 +216,8 @@
 
     <!-- 添加/编辑用户对话框 -->
     <el-dialog
-      :title="dialogTitle"
       v-model="dialogVisible"
+      :title="dialogTitle"
       width="500px"
     >
       <el-form
@@ -119,34 +226,56 @@
         :rules="rules"
         label-width="80px"
       >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" :disabled="!!form.id" />
+        <el-form-item
+          label="用户名"
+          prop="username"
+        >
+          <el-input
+            v-model="form.username"
+            :disabled="!!form.id"
+          />
         </el-form-item>
-        <el-form-item label="姓名" prop="fullName">
+        <el-form-item
+          label="姓名"
+          prop="fullName"
+        >
           <el-input v-model="form.fullName" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item
+          label="邮箱"
+          prop="email"
+        >
           <el-input v-model="form.email" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item
+          label="状态"
+          prop="status"
+        >
           <el-radio-group v-model="form.status">
-            <el-radio label="ENABLED">启用</el-radio>
-            <el-radio label="DISABLED">禁用</el-radio>
+            <el-radio label="ENABLED">
+              启用
+            </el-radio>
+            <el-radio label="DISABLED">
+              禁用
+            </el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
+          <el-button
+            type="primary"
+            @click="handleSubmit"
+          >确定</el-button>
         </span>
       </template>
     </el-dialog>
 
     <!-- 重置密码确认对话框 -->
     <el-dialog
-      title="重置密码"
       v-model="resetPasswordDialogVisible"
+      title="重置密码"
       width="400px"
     >
       <p>确定要重置用户 {{ selectedUser?.username }} 的密码吗？</p>
@@ -154,15 +283,18 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="resetPasswordDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmResetPassword">确定</el-button>
+          <el-button
+            type="primary"
+            @click="confirmResetPassword"
+          >确定</el-button>
         </span>
       </template>
     </el-dialog>
 
     <!-- 批量删除确认对话框 -->
     <el-dialog
-      title="批量删除"
       v-model="batchDeleteDialogVisible"
+      title="批量删除"
       width="400px"
     >
       <p>确定要删除选中的 {{ selectedUsers.length }} 个用户吗？</p>
@@ -170,7 +302,10 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="batchDeleteDialogVisible = false">取消</el-button>
-          <el-button type="danger" @click="confirmBatchDelete">确定</el-button>
+          <el-button
+            type="danger"
+            @click="confirmBatchDelete"
+          >确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -181,22 +316,37 @@
       title="编辑用户角色"
       width="30%"
     >
-      <el-form :model="roleForm" label-width="80px">
+      <el-form
+        :model="roleForm"
+        label-width="80px"
+      >
         <el-form-item label="用户名">
-          <el-input v-model="roleForm.username" disabled />
+          <el-input
+            v-model="roleForm.username"
+            disabled
+          />
         </el-form-item>
         <el-form-item label="角色">
           <el-checkbox-group v-model="selectedRoles">
-            <el-checkbox value="ADMIN">管理员</el-checkbox>
-            <el-checkbox value="MODERATOR">审核员</el-checkbox>
-            <el-checkbox value="USER">普通用户</el-checkbox>
+            <el-checkbox value="ADMIN">
+              管理员
+            </el-checkbox>
+            <el-checkbox value="MODERATOR">
+              审核员
+            </el-checkbox>
+            <el-checkbox value="USER">
+              普通用户
+            </el-checkbox>
           </el-checkbox-group>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="roleDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitRoles">确定</el-button>
+          <el-button
+            type="primary"
+            @click="submitRoles"
+          >确定</el-button>
         </span>
       </template>
     </el-dialog>

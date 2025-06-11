@@ -4,26 +4,63 @@
       <template #header>
         <div class="card-header">
           <span>谣言列表</span>
-          <el-button type="primary" @click="handleAdd">添加谣言</el-button>
+          <el-button
+            type="primary"
+            @click="handleAdd"
+          >
+            添加谣言
+          </el-button>
         </div>
       </template>
 
       <!-- 搜索表单 -->
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="请输入标题或内容" clearable />
+          <el-input
+            v-model="searchForm.keyword"
+            placeholder="请输入标题或内容"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态" clearable style="width: 200px;">
-            <el-option label="待验证" value="PENDING" />
-            <el-option label="已验证为真" value="VERIFIED_TRUE" />
-            <el-option label="已验证为假" value="VERIFIED_FALSE" />
-            <el-option label="调查中" value="UNDER_INVESTIGATION" />
+          <el-select
+            v-model="searchForm.status"
+            placeholder="请选择状态"
+            clearable
+            style="width: 200px;"
+          >
+            <el-option
+              label="待验证"
+              value="PENDING"
+            />
+            <el-option
+              label="已验证为真"
+              value="VERIFIED_TRUE"
+            />
+            <el-option
+              label="已验证为假"
+              value="VERIFIED_FALSE"
+            />
+            <el-option
+              label="调查中"
+              value="UNDER_INVESTIGATION"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
       
@@ -32,22 +69,61 @@
         :data="paginatedRumors"
         style="width: 100%"
       >
-        <el-table-column prop="title" label="标题" />
-        <el-table-column prop="source" label="来源" />
-        <el-table-column prop="status" label="状态" width="120">
+        <el-table-column
+          prop="title"
+          label="标题"
+        />
+        <el-table-column
+          prop="source"
+          label="来源"
+        />
+        <el-table-column
+          prop="status"
+          label="状态"
+          width="120"
+        >
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
               {{ getStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="publishTime" label="发布时间" width="180" />
-        <el-table-column prop="verifyTime" label="验证时间" width="180" />
-        <el-table-column label="操作" width="200">
+        <el-table-column
+          prop="publishTime"
+          label="发布时间"
+          width="180"
+        />
+        <el-table-column
+          prop="verifyTime"
+          label="验证时间"
+          width="180"
+        />
+        <el-table-column
+          label="操作"
+          width="200"
+        >
           <template #default="{ row }">
-            <el-button link type="primary" @click="handleView(row.id)">查看</el-button>
-            <el-button link type="primary" @click="handleEdit(row)">编辑</el-button>
-            <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
+            <el-button
+              link
+              type="primary"
+              @click="handleView(row.id)"
+            >
+              查看
+            </el-button>
+            <el-button
+              link
+              type="primary"
+              @click="handleEdit(row)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              link
+              type="danger"
+              @click="handleDelete(row.id)"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -78,10 +154,19 @@
         :rules="rules"
         label-width="80px"
       >
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入标题" />
+        <el-form-item
+          label="标题"
+          prop="title"
+        >
+          <el-input
+            v-model="form.title"
+            placeholder="请输入标题"
+          />
         </el-form-item>
-        <el-form-item label="内容" prop="content">
+        <el-form-item
+          label="内容"
+          prop="content"
+        >
           <el-input
             v-model="form.content"
             type="textarea"
@@ -89,14 +174,23 @@
             placeholder="请输入内容"
           />
         </el-form-item>
-        <el-form-item label="来源" prop="source">
-          <el-input v-model="form.source" placeholder="请输入来源" />
+        <el-form-item
+          label="来源"
+          prop="source"
+        >
+          <el-input
+            v-model="form.source"
+            placeholder="请输入来源"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
+          <el-button
+            type="primary"
+            @click="handleSubmit"
+          >确定</el-button>
         </span>
       </template>
     </el-dialog>

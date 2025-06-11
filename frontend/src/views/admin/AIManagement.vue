@@ -4,13 +4,24 @@
       <template #header>
         <div class="card-header">
           <span>AI 分析管理</span>
-          <el-button type="primary" @click="handleConfig">配置</el-button>
+          <el-button
+            type="primary"
+            @click="handleConfig"
+          >
+            配置
+          </el-button>
         </div>
       </template>
 
       <el-tabs v-model="activeTab">
-        <el-tab-pane label="文本分析" name="text">
-          <el-form :model="textForm" label-width="120px">
+        <el-tab-pane
+          label="文本分析"
+          name="text"
+        >
+          <el-form
+            :model="textForm"
+            label-width="120px"
+          >
             <el-form-item label="分析文本">
               <el-input
                 v-model="textForm.text"
@@ -20,19 +31,39 @@
               />
             </el-form-item>
             <el-form-item label="分析类型">
-              <el-select v-model="textForm.type" placeholder="请选择分析类型">
-                <el-option label="情感分析" value="SENTIMENT" />
-                <el-option label="可信度分析" value="CREDIBILITY" />
-                <el-option label="关键词提取" value="KEYWORDS" />
+              <el-select
+                v-model="textForm.type"
+                placeholder="请选择分析类型"
+              >
+                <el-option
+                  label="情感分析"
+                  value="SENTIMENT"
+                />
+                <el-option
+                  label="可信度分析"
+                  value="CREDIBILITY"
+                />
+                <el-option
+                  label="关键词提取"
+                  value="KEYWORDS"
+                />
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="handleTextAnalysis">开始分析</el-button>
+              <el-button
+                type="primary"
+                @click="handleTextAnalysis"
+              >
+                开始分析
+              </el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="图像分析" name="image">
+        <el-tab-pane
+          label="图像分析"
+          name="image"
+        >
           <el-upload
             class="upload-demo"
             drag
@@ -40,26 +71,52 @@
             :auto-upload="false"
             :on-change="handleImageChange"
           >
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <el-icon class="el-icon--upload">
+              <upload-filled />
+            </el-icon>
             <div class="el-upload__text">
               拖拽图片到此处或 <em>点击上传</em>
             </div>
           </el-upload>
-          <el-form :model="imageForm" label-width="120px" style="margin-top: 20px">
+          <el-form
+            :model="imageForm"
+            label-width="120px"
+            style="margin-top: 20px"
+          >
             <el-form-item label="分析类型">
-              <el-select v-model="imageForm.type" placeholder="请选择分析类型">
-                <el-option label="内容分析" value="CONTENT" />
-                <el-option label="篡改检测" value="MANIPULATION" />
-                <el-option label="OCR识别" value="OCR" />
+              <el-select
+                v-model="imageForm.type"
+                placeholder="请选择分析类型"
+              >
+                <el-option
+                  label="内容分析"
+                  value="CONTENT"
+                />
+                <el-option
+                  label="篡改检测"
+                  value="MANIPULATION"
+                />
+                <el-option
+                  label="OCR识别"
+                  value="OCR"
+                />
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="handleImageAnalysis">开始分析</el-button>
+              <el-button
+                type="primary"
+                @click="handleImageAnalysis"
+              >
+                开始分析
+              </el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="视频分析" name="video">
+        <el-tab-pane
+          label="视频分析"
+          name="video"
+        >
           <el-upload
             class="upload-demo"
             drag
@@ -67,45 +124,96 @@
             :auto-upload="false"
             :on-change="handleVideoChange"
           >
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <el-icon class="el-icon--upload">
+              <upload-filled />
+            </el-icon>
             <div class="el-upload__text">
               拖拽视频到此处或 <em>点击上传</em>
             </div>
           </el-upload>
-          <el-form :model="videoForm" label-width="120px" style="margin-top: 20px">
+          <el-form
+            :model="videoForm"
+            label-width="120px"
+            style="margin-top: 20px"
+          >
             <el-form-item label="分析类型">
-              <el-select v-model="videoForm.type" placeholder="请选择分析类型">
-                <el-option label="内容分析" value="CONTENT" />
-                <el-option label="关键帧提取" value="KEYFRAMES" />
-                <el-option label="音频分析" value="AUDIO" />
+              <el-select
+                v-model="videoForm.type"
+                placeholder="请选择分析类型"
+              >
+                <el-option
+                  label="内容分析"
+                  value="CONTENT"
+                />
+                <el-option
+                  label="关键帧提取"
+                  value="KEYFRAMES"
+                />
+                <el-option
+                  label="音频分析"
+                  value="AUDIO"
+                />
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="handleVideoAnalysis">开始分析</el-button>
+              <el-button
+                type="primary"
+                @click="handleVideoAnalysis"
+              >
+                开始分析
+              </el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
       </el-tabs>
 
-      <el-dialog v-model="configDialogVisible" title="AI 分析配置" width="50%">
-        <el-form :model="configForm" label-width="120px">
+      <el-dialog
+        v-model="configDialogVisible"
+        title="AI 分析配置"
+        width="50%"
+      >
+        <el-form
+          :model="configForm"
+          label-width="120px"
+        >
           <el-form-item label="模型选择">
-            <el-select v-model="configForm.model" placeholder="请选择模型">
-              <el-option label="模型A" value="modelA" />
-              <el-option label="模型B" value="modelB" />
+            <el-select
+              v-model="configForm.model"
+              placeholder="请选择模型"
+            >
+              <el-option
+                label="模型A"
+                value="modelA"
+              />
+              <el-option
+                label="模型B"
+                value="modelB"
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="置信度阈值">
-            <el-slider v-model="configForm.confidence" :min="0" :max="1" :step="0.1" />
+            <el-slider
+              v-model="configForm.confidence"
+              :min="0"
+              :max="1"
+              :step="0.1"
+            />
           </el-form-item>
           <el-form-item label="分析超时时间">
-            <el-input-number v-model="configForm.timeout" :min="1" :max="60" />
+            <el-input-number
+              v-model="configForm.timeout"
+              :min="1"
+              :max="60"
+            />
           </el-form-item>
         </el-form>
         <template #footer>
           <span class="dialog-footer">
             <el-button @click="configDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="handleConfigSubmit">确定</el-button>
+            <el-button
+              type="primary"
+              @click="handleConfigSubmit"
+            >确定</el-button>
           </span>
         </template>
       </el-dialog>

@@ -2,7 +2,10 @@
   <el-container class="admin-layout-container">
     <el-aside width="200px">
       <div class="logo">
-        <img src="@/assets/logo.png" alt="Logo">
+        <img
+          src="@/assets/logo.png"
+          alt="Logo"
+        >
         <span>管理后台</span>
       </div>
       <el-menu
@@ -17,15 +20,24 @@
           <el-icon><el-icon-s-home /></el-icon>
           <span>管理控制台</span>
         </el-menu-item>
-        <el-menu-item v-if="hasRole('ADMIN')" index="/admin/users">
+        <el-menu-item
+          v-if="hasRole('ADMIN')"
+          index="/admin/users"
+        >
           <el-icon><el-icon-user-filled /></el-icon>
           <span>用户管理</span>
         </el-menu-item>
-        <el-menu-item v-if="hasRole('ADMIN') || hasRole('MODERATOR')" index="/admin/comments">
+        <el-menu-item
+          v-if="hasRole('ADMIN') || hasRole('MODERATOR')"
+          index="/admin/comments"
+        >
           <el-icon><el-icon-chat-dot-round /></el-icon>
           <span>评论管理</span>
         </el-menu-item>
-        <el-sub-menu v-if="hasRole('ADMIN')" index="/admin/logs">
+        <el-sub-menu
+          v-if="hasRole('ADMIN')"
+          index="/admin/logs"
+        >
           <template #title>
             <el-icon><el-icon-document-copy /></el-icon>
             <span>日志管理</span>
@@ -47,15 +59,24 @@
             <span>审计日志</span>
           </el-menu-item>
         </el-sub-menu>
-        <el-menu-item v-if="hasRole('ADMIN')" index="/admin/analytics">
+        <el-menu-item
+          v-if="hasRole('ADMIN')"
+          index="/admin/analytics"
+        >
           <el-icon><el-icon-data-analysis /></el-icon>
           <span>数据分析</span>
         </el-menu-item>
-        <el-menu-item v-if="hasRole('ADMIN')" index="/admin/ai-management">
+        <el-menu-item
+          v-if="hasRole('ADMIN')"
+          index="/admin/ai-management"
+        >
           <el-icon><el-icon-data-analysis /></el-icon>
           <span>AI管理</span>
         </el-menu-item>
-        <el-menu-item v-if="hasRole('ADMIN')" index="/admin/settings">
+        <el-menu-item
+          v-if="hasRole('ADMIN')"
+          index="/admin/settings"
+        >
           <el-icon><el-icon-setting /></el-icon>
           <span>系统设置</span>
         </el-menu-item>
@@ -64,7 +85,7 @@
           <span>管理员信息</span>
         </el-menu-item>
         <!-- Link back to the main application -->
-        <el-divider></el-divider>
+        <el-divider />
         <el-menu-item index="/">
           <el-icon><el-icon-back /></el-icon>
           <span>返回主系统</span>
@@ -76,7 +97,9 @@
       <el-header>
         <div class="header-left">
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/admin/dashboard' }">管理后台</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/admin/dashboard' }">
+              管理后台
+            </el-breadcrumb-item>
             <el-breadcrumb-item>{{ currentRoute }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -88,8 +111,12 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="handleProfile">管理员信息</el-dropdown-item>
-                <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                <el-dropdown-item @click="handleProfile">
+                  管理员信息
+                </el-dropdown-item>
+                <el-dropdown-item @click="handleLogout">
+                  退出登录
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>

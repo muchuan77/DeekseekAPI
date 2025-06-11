@@ -5,13 +5,28 @@
         <div class="card-header">
           <span>谣言详情</span>
           <div>
-            <el-button link type="primary" @click="router.push('/rumors')">返回列表</el-button>
-            <el-button link type="primary" @click="handleEdit">编辑</el-button>
+            <el-button
+              link
+              type="primary"
+              @click="router.push('/rumors')"
+            >
+              返回列表
+            </el-button>
+            <el-button
+              link
+              type="primary"
+              @click="handleEdit"
+            >
+              编辑
+            </el-button>
           </div>
         </div>
       </template>
 
-      <div v-if="currentRumor" class="detail-content">
+      <div
+        v-if="currentRumor"
+        class="detail-content"
+      >
         <div class="detail-item">
           <span class="label">标题：</span>
           <span class="value">{{ currentRumor.title }}</span>
@@ -26,7 +41,9 @@
         </div>
         <div class="detail-item">
           <span class="label">状态：</span>
-          <el-tag :type="getStatusType(currentRumor.status)">{{ getStatusText(currentRumor.status) }}</el-tag>
+          <el-tag :type="getStatusType(currentRumor.status)">
+            {{ getStatusText(currentRumor.status) }}
+          </el-tag>
         </div>
         <div class="detail-item">
           <span class="label">发布时间：</span>
@@ -47,20 +64,51 @@
       </div>
 
       <div class="action-buttons">
-        <el-button type="success" @click="handleUpdateStatus('VERIFIED_TRUE')">标记为真</el-button>
-        <el-button type="danger" @click="handleUpdateStatus('VERIFIED_FALSE')">标记为假</el-button>
-        <el-button type="warning" @click="handleUpdateStatus('PENDING')">标记为待验证</el-button>
-        <el-button type="info" @click="handleUpdateStatus('UNDER_INVESTIGATION')">标记为调查中</el-button>
+        <el-button
+          type="success"
+          @click="handleUpdateStatus('VERIFIED_TRUE')"
+        >
+          标记为真
+        </el-button>
+        <el-button
+          type="danger"
+          @click="handleUpdateStatus('VERIFIED_FALSE')"
+        >
+          标记为假
+        </el-button>
+        <el-button
+          type="warning"
+          @click="handleUpdateStatus('PENDING')"
+        >
+          标记为待验证
+        </el-button>
+        <el-button
+          type="info"
+          @click="handleUpdateStatus('UNDER_INVESTIGATION')"
+        >
+          标记为调查中
+        </el-button>
       </div>
     </el-card>
 
-    <el-dialog v-model="dialogVisible" title="编辑谣言" width="50%">
-      <el-form :model="form" label-width="80px">
+    <el-dialog
+      v-model="dialogVisible"
+      title="编辑谣言"
+      width="50%"
+    >
+      <el-form
+        :model="form"
+        label-width="80px"
+      >
         <el-form-item label="标题">
           <el-input v-model="form.title" />
         </el-form-item>
         <el-form-item label="内容">
-          <el-input v-model="form.content" type="textarea" rows="4" />
+          <el-input
+            v-model="form.content"
+            type="textarea"
+            rows="4"
+          />
         </el-form-item>
         <el-form-item label="来源">
           <el-input v-model="form.source" />
@@ -69,7 +117,10 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
+          <el-button
+            type="primary"
+            @click="handleSubmit"
+          >确定</el-button>
         </span>
       </template>
     </el-dialog>

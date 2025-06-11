@@ -4,25 +4,60 @@
       <template #header>
         <div class="card-header">
           <span>权限管理</span>
-          <el-button type="primary" @click="handleAdd">添加权限</el-button>
+          <el-button
+            type="primary"
+            @click="handleAdd"
+          >
+            添加权限
+          </el-button>
         </div>
       </template>
 
-      <el-table :data="permissions" style="width: 100%">
-        <el-table-column prop="name" label="权限名称" />
-        <el-table-column prop="code" label="权限编码" />
-        <el-table-column prop="description" label="描述" />
-        <el-table-column prop="status" label="状态">
+      <el-table
+        :data="permissions"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="name"
+          label="权限名称"
+        />
+        <el-table-column
+          prop="code"
+          label="权限编码"
+        />
+        <el-table-column
+          prop="description"
+          label="描述"
+        />
+        <el-table-column
+          prop="status"
+          label="状态"
+        >
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">
               {{ row.status === 1 ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200">
+        <el-table-column
+          label="操作"
+          width="200"
+        >
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+            <el-button
+              type="primary"
+              link
+              @click="handleEdit(row)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              type="danger"
+              link
+              @click="handleDelete(row)"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -40,20 +75,32 @@
         :rules="rules"
         label-width="100px"
       >
-        <el-form-item label="权限名称" prop="name">
+        <el-form-item
+          label="权限名称"
+          prop="name"
+        >
           <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="权限编码" prop="code">
+        <el-form-item
+          label="权限编码"
+          prop="code"
+        >
           <el-input v-model="form.code" />
         </el-form-item>
-        <el-form-item label="描述" prop="description">
+        <el-form-item
+          label="描述"
+          prop="description"
+        >
           <el-input
             v-model="form.description"
             type="textarea"
             :rows="3"
           />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item
+          label="状态"
+          prop="status"
+        >
           <el-switch
             v-model="form.status"
             :active-value="1"
@@ -66,7 +113,10 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
+          <el-button
+            type="primary"
+            @click="handleSubmit"
+          >确定</el-button>
         </span>
       </template>
     </el-dialog>

@@ -12,14 +12,20 @@
         :rules="rules"
         label-width="80px"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item
+          label="用户名"
+          prop="username"
+        >
           <el-input 
             v-model="form.username" 
             placeholder="请输入用户名"
             @keyup.enter="handleLogin"
           />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item
+          label="密码"
+          prop="password"
+        >
           <el-input
             v-model="form.password"
             type="password"
@@ -29,14 +35,21 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleLogin" :loading="loading" style="width: 100%">
+          <el-button
+            type="primary"
+            :loading="loading"
+            style="width: 100%"
+            @click="handleLogin"
+          >
             登录
           </el-button>
         </el-form-item>
         <el-form-item>
           <div class="register-link">
             <span>还没有账号？</span>
-            <router-link to="/register">立即注册</router-link>
+            <router-link to="/register">
+              立即注册
+            </router-link>
           </div>
         </el-form-item>
       </el-form>

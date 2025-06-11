@@ -1,103 +1,157 @@
 <template>
-    <div class="sync-container">
-      <el-row :gutter="20">
-        <!-- 同步状态卡片 -->
-        <el-col :span="12">
-          <el-card class="sync-card">
-            <template #header>
-              <div class="card-header">
-                <span>数据同步状态</span>
-                <el-button 
-                  type="primary" 
-                  :loading="isSyncing" 
-                  @click="startSync"
-                  :disabled="isSyncing"
-                >
-                  立即同步
-                </el-button>
-              </div>
-            </template>
-            <div class="sync-info">
-              <p>最后同步时间：{{ formattedLastSyncTime }}</p>
-              <p>同步状态：
-                <el-tag :type="getStatusType(syncStatus)">
-                  {{ getStatusText(syncStatus) }}
-                </el-tag>
-              </p>
-              <p v-if="hasError" class="error-message">
-                错误信息：{{ syncError }}
-              </p>
+  <div class="sync-container">
+    <el-row :gutter="20">
+      <!-- 同步状态卡片 -->
+      <el-col :span="12">
+        <el-card class="sync-card">
+          <template #header>
+            <div class="card-header">
+              <span>数据同步状态</span>
+              <el-button 
+                type="primary" 
+                :loading="isSyncing" 
+                :disabled="isSyncing"
+                @click="startSync"
+              >
+                立即同步
+              </el-button>
             </div>
-          </el-card>
-        </el-col>
-  
-        <!-- 缓存管理卡片 -->
-        <el-col :span="12">
-          <el-card class="cache-card">
-            <template #header>
-              <div class="card-header">
-                <span>缓存管理</span>
-                <el-button type="danger" @click="clearCache">清除缓存</el-button>
-              </div>
-            </template>
-            <div class="cache-info">
-              <p>缓存大小：{{ formatSize(cacheSize) }}</p>
-              <p>缓存项数量：{{ cacheItems.length }}</p>
-            </div>
-            <el-table :data="cacheItems" style="width: 100%">
-              <el-table-column prop="key" label="键名" />
-              <el-table-column prop="size" label="大小">
-                <template #default="scope">
-                  {{ formatSize(scope.row.size) }}
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="120">
-                <template #default="scope">
-                  <el-button 
-                    type="danger" 
-                    size="small" 
-                    @click="removeCacheItem(scope.row.key)"
-                  >
-                    删除
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-        </el-col>
-      </el-row>
-  
-      <!-- 同步设置 -->
-      <el-card class="settings-card">
-        <template #header>
-          <div class="card-header">
-            <span>同步设置</span>
+          </template>
+          <div class="sync-info">
+            <p>最后同步时间：{{ formattedLastSyncTime }}</p>
+            <p>
+              同步状态：
+              <el-tag :type="getStatusType(syncStatus)">
+                {{ getStatusText(syncStatus) }}
+              </el-tag>
+            </p>
+            <p
+              v-if="hasError"
+              class="error-message"
+            >
+              错误信息：{{ syncError }}
+            </p>
           </div>
-        </template>
-        <el-form :model="syncSettings" label-width="120px">
-          <el-form-item label="自动同步">
-            <el-switch v-model="syncSettings.autoSync" @change="handleSettingsChange" />
-          </el-form-item>
-          <el-form-item label="同步间隔">
-            <el-select v-model="syncSettings.interval" :disabled="!syncSettings.autoSync" @change="handleSettingsChange">
-              <el-option label="5分钟" value="5" />
-              <el-option label="15分钟" value="15" />
-              <el-option label="30分钟" value="30" />
-              <el-option label="1小时" value="60" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="同步数据类型">
-            <el-checkbox-group v-model="syncSettings.dataTypes" @change="handleSettingsChange">
-              <el-checkbox value="user">用户数据</el-checkbox>
-              <el-checkbox value="rumor">谣言数据</el-checkbox>
-              <el-checkbox value="analysis">分析数据</el-checkbox>
-              <el-checkbox value="blockchain">区块链数据</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-        </el-form>
-      </el-card>
-    </div>
-  </template>
+        </el-card>
+      </el-col>
+  
+      <!-- 缓存管理卡片 -->
+      <el-col :span="12">
+        <el-card class="cache-card">
+          <template #header>
+            <div class="card-header">
+              <span>缓存管理</span>
+              <el-button
+                type="danger"
+                @click="clearCache"
+              >
+                清除缓存
+              </el-button>
+            </div>
+          </template>
+          <div class="cache-info">
+            <p>缓存大小：{{ formatSize(cacheSize) }}</p>
+            <p>缓存项数量：{{ cacheItems.length }}</p>
+          </div>
+          <el-table
+            :data="cacheItems"
+            style="width: 100%"
+          >
+            <el-table-column
+              prop="key"
+              label="键名"
+            />
+            <el-table-column
+              prop="size"
+              label="大小"
+            >
+              <template #default="scope">
+                {{ formatSize(scope.row.size) }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="操作"
+              width="120"
+            >
+              <template #default="scope">
+                <el-button 
+                  type="danger" 
+                  size="small" 
+                  @click="removeCacheItem(scope.row.key)"
+                >
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
+  
+    <!-- 同步设置 -->
+    <el-card class="settings-card">
+      <template #header>
+        <div class="card-header">
+          <span>同步设置</span>
+        </div>
+      </template>
+      <el-form
+        :model="syncSettings"
+        label-width="120px"
+      >
+        <el-form-item label="自动同步">
+          <el-switch
+            v-model="syncSettings.autoSync"
+            @change="handleSettingsChange"
+          />
+        </el-form-item>
+        <el-form-item label="同步间隔">
+          <el-select
+            v-model="syncSettings.interval"
+            :disabled="!syncSettings.autoSync"
+            @change="handleSettingsChange"
+          >
+            <el-option
+              label="5分钟"
+              value="5"
+            />
+            <el-option
+              label="15分钟"
+              value="15"
+            />
+            <el-option
+              label="30分钟"
+              value="30"
+            />
+            <el-option
+              label="1小时"
+              value="60"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="同步数据类型">
+          <el-checkbox-group
+            v-model="syncSettings.dataTypes"
+            @change="handleSettingsChange"
+          >
+            <el-checkbox value="user">
+              用户数据
+            </el-checkbox>
+            <el-checkbox value="rumor">
+              谣言数据
+            </el-checkbox>
+            <el-checkbox value="analysis">
+              分析数据
+            </el-checkbox>
+            <el-checkbox value="blockchain">
+              区块链数据
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </div>
+</template>
   
   <script setup>
   import { ref, onMounted } from 'vue'

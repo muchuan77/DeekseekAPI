@@ -7,30 +7,74 @@
         </div>
       </template>
 
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.rumorId" placeholder="谣言ID" />
+          <el-input
+            v-model="searchForm.rumorId"
+            placeholder="谣言ID"
+          />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
 
-      <el-table :data="comments" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="content" label="评论内容" />
-        <el-table-column prop="username" label="评论用户" width="120" />
-        <el-table-column prop="rumorTitle" label="相关谣言" width="200" />
-        <el-table-column prop="createTime" label="评论时间" width="180" />
-        <el-table-column prop="status" label="状态" width="100">
+      <el-table
+        v-loading="loading"
+        :data="comments"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="80"
+        />
+        <el-table-column
+          prop="content"
+          label="评论内容"
+        />
+        <el-table-column
+          prop="username"
+          label="评论用户"
+          width="120"
+        />
+        <el-table-column
+          prop="rumorTitle"
+          label="相关谣言"
+          width="200"
+        />
+        <el-table-column
+          prop="createTime"
+          label="评论时间"
+          width="180"
+        />
+        <el-table-column
+          prop="status"
+          label="状态"
+          width="100"
+        >
           <template #default="{ row }">
             <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'danger'">
               {{ row.status === 'ACTIVE' ? '正常' : '已删除' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column
+          label="操作"
+          width="150"
+        >
           <template #default="{ row }">
             <el-button
               v-if="row.status === 'ACTIVE'"

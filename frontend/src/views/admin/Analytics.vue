@@ -2,22 +2,39 @@
   <div class="analytics">
     <el-row :gutter="20">
       <!-- 数据概览卡片 -->
-      <el-col :span="6" v-for="(item, index) in overviewData" :key="index">
-        <el-card shadow="hover" class="overview-card">
+      <el-col
+        v-for="(item, index) in overviewData"
+        :key="index"
+        :span="6"
+      >
+        <el-card
+          shadow="hover"
+          class="overview-card"
+        >
           <div class="overview-content">
-            <div class="overview-icon" :style="{ backgroundColor: item.color }">
+            <div
+              class="overview-icon"
+              :style="{ backgroundColor: item.color }"
+            >
               <el-icon><component :is="item.icon" /></el-icon>
             </div>
             <div class="overview-info">
-              <div class="overview-title">{{ item.title }}</div>
-              <div class="overview-value">{{ item.value }}</div>
+              <div class="overview-title">
+                {{ item.title }}
+              </div>
+              <div class="overview-value">
+                {{ item.value }}
+              </div>
             </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" class="chart-row">
+    <el-row
+      :gutter="20"
+      class="chart-row"
+    >
       <!-- 谣言类型分布 -->
       <el-col :span="12">
         <el-card>
@@ -27,7 +44,11 @@
             </div>
           </template>
           <div class="chart-container">
-            <v-chart class="chart" :option="typeChartOption" autoresize />
+            <v-chart
+              class="chart"
+              :option="typeChartOption"
+              autoresize
+            />
           </div>
         </el-card>
       </el-col>
@@ -41,13 +62,20 @@
             </div>
           </template>
           <div class="chart-container">
-            <v-chart class="chart" :option="trendChartOption" autoresize />
+            <v-chart
+              class="chart"
+              :option="trendChartOption"
+              autoresize
+            />
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" class="chart-row">
+    <el-row
+      :gutter="20"
+      class="chart-row"
+    >
       <!-- 用户活跃度 -->
       <el-col :span="12">
         <el-card>
@@ -57,7 +85,11 @@
             </div>
           </template>
           <div class="chart-container">
-            <v-chart class="chart" :option="userActivityChartOption" autoresize />
+            <v-chart
+              class="chart"
+              :option="userActivityChartOption"
+              autoresize
+            />
           </div>
         </el-card>
       </el-col>
@@ -71,7 +103,11 @@
             </div>
           </template>
           <div class="chart-container">
-            <v-chart class="chart" :option="sentimentChartOption" autoresize />
+            <v-chart
+              class="chart"
+              :option="sentimentChartOption"
+              autoresize
+            />
           </div>
         </el-card>
       </el-col>

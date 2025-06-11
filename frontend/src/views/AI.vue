@@ -4,17 +4,31 @@
       <template #header>
         <div class="card-header">
           <span>AI 分析</span>
-          <el-radio-group v-model="analysisType" size="small">
-            <el-radio-button value="text">文本分析</el-radio-button>
-            <el-radio-button value="image">图片分析</el-radio-button>
-            <el-radio-button value="video">视频分析</el-radio-button>
-            <el-radio-button value="multimodal">多模态分析</el-radio-button>
+          <el-radio-group
+            v-model="analysisType"
+            size="small"
+          >
+            <el-radio-button value="text">
+              文本分析
+            </el-radio-button>
+            <el-radio-button value="image">
+              图片分析
+            </el-radio-button>
+            <el-radio-button value="video">
+              视频分析
+            </el-radio-button>
+            <el-radio-button value="multimodal">
+              多模态分析
+            </el-radio-button>
           </el-radio-group>
         </div>
       </template>
 
       <!-- 文本分析 -->
-      <div v-if="analysisType === 'text'" class="text-analysis">
+      <div
+        v-if="analysisType === 'text'"
+        class="text-analysis"
+      >
         <el-input
           v-model="textContent"
           type="textarea"
@@ -22,14 +36,21 @@
           placeholder="请输入要分析的文本内容"
         />
         <div class="button-group">
-          <el-button type="primary" @click="analyzeTextContent" :loading="loading">
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="analyzeTextContent"
+          >
             开始分析
           </el-button>
         </div>
       </div>
 
       <!-- 图片分析 -->
-      <div v-if="analysisType === 'image'" class="image-analysis">
+      <div
+        v-if="analysisType === 'image'"
+        class="image-analysis"
+      >
         <el-upload
           class="upload-demo"
           drag
@@ -46,14 +67,21 @@
           </div>
         </el-upload>
         <div class="button-group">
-          <el-button type="primary" @click="analyzeImageContent" :loading="loading">
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="analyzeImageContent"
+          >
             开始分析
           </el-button>
         </div>
       </div>
 
       <!-- 视频分析 -->
-      <div v-if="analysisType === 'video'" class="video-analysis">
+      <div
+        v-if="analysisType === 'video'"
+        class="video-analysis"
+      >
         <el-upload
           class="upload-demo"
           drag
@@ -70,14 +98,21 @@
           </div>
         </el-upload>
         <div class="button-group">
-          <el-button type="primary" @click="analyzeVideoContent" :loading="loading">
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="analyzeVideoContent"
+          >
             开始分析
           </el-button>
         </div>
       </div>
 
       <!-- 多模态分析 -->
-      <div v-if="analysisType === 'multimodal'" class="multimodal-analysis">
+      <div
+        v-if="analysisType === 'multimodal'"
+        class="multimodal-analysis"
+      >
         <div class="text-input">
           <el-input
             v-model="textContent"
@@ -136,7 +171,11 @@
         </div>
         
         <div class="button-group">
-          <el-button type="primary" @click="analyzeMultiModalContent" :loading="loading">
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="analyzeMultiModalContent"
+          >
             开始分析
           </el-button>
         </div>
@@ -144,7 +183,13 @@
     </el-card>
 
     <!-- 分析进度 -->
-    <el-dialog v-model="showProgress" title="分析中..." width="30%" :close-on-click-modal="false" :show-close="false">
+    <el-dialog
+      v-model="showProgress"
+      title="分析中..."
+      width="30%"
+      :close-on-click-modal="false"
+      :show-close="false"
+    >
       <div class="progress-dialog">
         <el-progress
           :percentage="progressPercentage"
@@ -154,8 +199,11 @@
           status="warning"
         />
         <div class="progress-steps">
-          <div v-for="(step, index) in progressSteps" :key="index" 
-               :class="['progress-step', { 'active': currentStep >= index }]">
+          <div
+            v-for="(step, index) in progressSteps"
+            :key="index" 
+            :class="['progress-step', { 'active': currentStep >= index }]"
+          >
             <el-icon v-if="currentStep > index">
               <component :is="icons.Check" />
             </el-icon>
@@ -168,17 +216,26 @@
             <span>{{ step }}</span>
           </div>
         </div>
-        <div class="progress-message">{{ progressMessage }}</div>
+        <div class="progress-message">
+          {{ progressMessage }}
+        </div>
       </div>
     </el-dialog>
 
     <!-- 分析结果 -->
-    <el-card v-if="analysisResult" class="result-card">
+    <el-card
+      v-if="analysisResult"
+      class="result-card"
+    >
       <template #header>
         <div class="card-header">
           <span>分析结果</span>
           <div class="header-actions">
-            <el-button size="small" @click="exportResult" type="success">
+            <el-button
+              size="small"
+              type="success"
+              @click="exportResult"
+            >
               <el-icon>
                 <component :is="icons.Download" />
               </el-icon>
@@ -213,7 +270,10 @@
               {{ point }}
             </el-timeline-item>
           </el-timeline>
-          <div v-else class="empty-text">
+          <div
+            v-else
+            class="empty-text"
+          >
             暂无事实核查要点
           </div>
         </div>
@@ -230,7 +290,10 @@
             show-icon
             class="indicator-item"
           />
-          <div v-if="!analysisResult?.misinformationIndicators?.length" class="empty-text">
+          <div
+            v-if="!analysisResult?.misinformationIndicators?.length"
+            class="empty-text"
+          >
             暂无虚假信息指标
           </div>
         </div>
@@ -238,7 +301,10 @@
         <!-- 验证建议 -->
         <div class="result-item">
           <h3>验证建议</h3>
-          <el-card shadow="never" class="verification-card">
+          <el-card
+            shadow="never"
+            class="verification-card"
+          >
             <template #header>
               <div class="verification-header">
                 <el-icon>
@@ -254,7 +320,10 @@
         <!-- 来源分析 -->
         <div class="result-item">
           <h3>来源分析</h3>
-          <el-card shadow="hover" class="source-analysis-card">
+          <el-card
+            shadow="hover"
+            class="source-analysis-card"
+          >
             <div class="source-reliability">
               <span class="label">可靠性评分:</span>
               <el-progress
@@ -283,7 +352,12 @@
                   </el-tag>
                 </el-collapse-item>
               </el-collapse>
-              <div v-else class="empty-text">暂无关注点</div>
+              <div
+                v-else
+                class="empty-text"
+              >
+                暂无关注点
+              </div>
             </div>
           </el-card>
         </div>

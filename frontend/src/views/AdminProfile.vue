@@ -5,31 +5,46 @@
         <div class="card-header">
           <span>管理员管理</span>
           <el-button 
-            type="primary" 
+            v-if="userStore.hasPermission('admin:create')" 
+            type="primary"
             @click="handleAdd"
-            v-if="userStore.hasPermission('admin:create')"
           >
             添加管理员
           </el-button>
         </div>
       </template>
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="username" label="用户名" />
-        <el-table-column prop="email" label="邮箱" />
-        <el-table-column prop="role" label="角色" />
-        <el-table-column label="操作" width="200">
+      <el-table
+        :data="tableData"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="username"
+          label="用户名"
+        />
+        <el-table-column
+          prop="email"
+          label="邮箱"
+        />
+        <el-table-column
+          prop="role"
+          label="角色"
+        />
+        <el-table-column
+          label="操作"
+          width="200"
+        >
           <template #default="{ row }">
             <el-button 
-              type="text" 
+              v-if="userStore.hasPermission('admin:update')" 
+              type="text"
               @click="handleEdit(row)"
-              v-if="userStore.hasPermission('admin:update')"
             >
               编辑
             </el-button>
             <el-button 
-              type="text" 
+              v-if="userStore.hasPermission('admin:delete')" 
+              type="text"
               @click="handleDelete(row)"
-              v-if="userStore.hasPermission('admin:delete')"
             >
               删除
             </el-button>

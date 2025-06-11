@@ -4,14 +4,26 @@
       <template #header>
         <div class="card-header">
           <span>传播路径分析</span>
-          <el-button type="primary" @click="refreshData">刷新数据</el-button>
+          <el-button
+            type="primary"
+            @click="refreshData"
+          >
+            刷新数据
+          </el-button>
         </div>
       </template>
 
       <!-- 搜索表单 -->
-      <el-form :model="searchForm" :inline="true" class="search-form">
+      <el-form
+        :model="searchForm"
+        :inline="true"
+        class="search-form"
+      >
         <el-form-item label="谣言ID">
-          <el-input v-model="searchForm.rumorId" placeholder="请输入谣言ID" />
+          <el-input
+            v-model="searchForm.rumorId"
+            placeholder="请输入谣言ID"
+          />
         </el-form-item>
         <el-form-item label="时间范围">
           <el-date-picker
@@ -24,37 +36,84 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
 
       <!-- 传播路径图 -->
       <div class="trace-chart">
-        <v-chart class="chart" :option="traceOption" autoresize />
+        <v-chart
+          class="chart"
+          :option="traceOption"
+          autoresize
+        />
       </div>
 
       <!-- 传播数据表格 -->
-      <el-table :data="propagationStore.traceData" style="width: 100%" class="trace-table">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="source" label="来源" width="120" />
-        <el-table-column prop="target" label="目标" width="120" />
-        <el-table-column prop="timestamp" label="时间" width="180">
+      <el-table
+        :data="propagationStore.traceData"
+        style="width: 100%"
+        class="trace-table"
+      >
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="80"
+        />
+        <el-table-column
+          prop="source"
+          label="来源"
+          width="120"
+        />
+        <el-table-column
+          prop="target"
+          label="目标"
+          width="120"
+        />
+        <el-table-column
+          prop="timestamp"
+          label="时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.timestamp) }}
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="100">
+        <el-table-column
+          prop="type"
+          label="类型"
+          width="100"
+        >
           <template #default="{ row }">
             <el-tag :type="getTypeTag(row.type)">
               {{ getTypeText(row.type) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="content" label="内容" show-overflow-tooltip />
-        <el-table-column label="操作" width="120">
+        <el-table-column
+          prop="content"
+          label="内容"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          label="操作"
+          width="120"
+        >
           <template #default="{ row }">
-            <el-button type="text" @click="viewDetail(row)">查看详情</el-button>
+            <el-button
+              type="text"
+              @click="viewDetail(row)"
+            >
+              查看详情
+            </el-button>
           </template>
         </el-table-column>
       </el-table>

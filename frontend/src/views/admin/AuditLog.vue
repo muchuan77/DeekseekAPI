@@ -7,19 +7,47 @@
         </div>
       </template>
 
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="审计类型">
-          <el-select v-model="searchForm.auditType" placeholder="请选择审计类型">
-            <el-option label="全部" value="" />
-            <el-option label="认证" value="AUTHENTICATION" />
-            <el-option label="授权" value="AUTHORIZATION" />
-            <el-option label="数据访问" value="DATA_ACCESS" />
-            <el-option label="配置变更" value="CONFIG_CHANGE" />
-            <el-option label="安全事件" value="SECURITY_EVENT" />
+          <el-select
+            v-model="searchForm.auditType"
+            placeholder="请选择审计类型"
+          >
+            <el-option
+              label="全部"
+              value=""
+            />
+            <el-option
+              label="认证"
+              value="AUTHENTICATION"
+            />
+            <el-option
+              label="授权"
+              value="AUTHORIZATION"
+            />
+            <el-option
+              label="数据访问"
+              value="DATA_ACCESS"
+            />
+            <el-option
+              label="配置变更"
+              value="CONFIG_CHANGE"
+            />
+            <el-option
+              label="安全事件"
+              value="SECURITY_EVENT"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="用户名">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名" />
+          <el-input
+            v-model="searchForm.username"
+            placeholder="请输入用户名"
+          />
         </el-form-item>
         <el-form-item label="时间范围">
           <el-date-picker
@@ -32,30 +60,72 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            搜索
+          </el-button>
+          <el-button @click="resetSearch">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
 
-      <el-table :data="logs" style="width: 100%" v-loading="loading">
-        <el-table-column prop="timestamp" label="时间" width="180">
+      <el-table
+        v-loading="loading"
+        :data="logs"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="timestamp"
+          label="时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.timestamp) }}
           </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="auditType" label="审计类型" width="120">
+        <el-table-column
+          prop="username"
+          label="用户名"
+          width="120"
+        />
+        <el-table-column
+          prop="auditType"
+          label="审计类型"
+          width="120"
+        >
           <template #default="{ row }">
             <el-tag :type="getAuditType(row.auditType)">
               {{ getAuditTypeText(row.auditType) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="resource" label="资源" width="150" />
-        <el-table-column prop="action" label="操作" width="120" />
-        <el-table-column prop="details" label="详细信息" />
-        <el-table-column prop="ip" label="IP地址" width="150" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column
+          prop="resource"
+          label="资源"
+          width="150"
+        />
+        <el-table-column
+          prop="action"
+          label="操作"
+          width="120"
+        />
+        <el-table-column
+          prop="details"
+          label="详细信息"
+        />
+        <el-table-column
+          prop="ip"
+          label="IP地址"
+          width="150"
+        />
+        <el-table-column
+          prop="status"
+          label="状态"
+          width="100"
+        >
           <template #default="{ row }">
             <el-tag :type="row.status === 'SUCCESS' ? 'success' : 'danger'">
               {{ row.status === 'SUCCESS' ? '成功' : '失败' }}

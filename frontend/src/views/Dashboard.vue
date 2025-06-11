@@ -1,105 +1,230 @@
 <template>
   <div class="dashboard">
     <el-row :gutter="20">
-      <el-col :span="4" v-for="(card, index) in cards" :key="index">
-        <el-card shadow="hover" class="dashboard-card" v-loading="loading">
+      <el-col
+        v-for="(card, index) in cards"
+        :key="index"
+        :span="4"
+      >
+        <el-card
+          v-loading="loading"
+          shadow="hover"
+          class="dashboard-card"
+        >
           <div class="card-content">
-            <div class="card-icon" :style="{ backgroundColor: card.color }">
+            <div
+              class="card-icon"
+              :style="{ backgroundColor: card.color }"
+            >
               <el-icon><component :is="card.icon" /></el-icon>
             </div>
             <div class="card-info">
-              <div class="card-value">{{ card.value }}</div>
-              <div class="card-title">{{ card.title }}</div>
+              <div class="card-value">
+                {{ card.value }}
+              </div>
+              <div class="card-title">
+                {{ card.title }}
+              </div>
             </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" class="chart-row">
+    <el-row
+      :gutter="20"
+      class="chart-row"
+    >
       <el-col :span="12">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card
+          v-loading="loading"
+          shadow="hover"
+        >
           <template #header>
             <div class="card-header">
               <span>谣言趋势</span>
-              <el-radio-group v-model="trendTimeRange" size="small" @change="handleTimeRangeChange">
-                <el-radio-button value="week">本周</el-radio-button>
-                <el-radio-button value="month">本月</el-radio-button>
-                <el-radio-button value="year">本年</el-radio-button>
+              <el-radio-group
+                v-model="trendTimeRange"
+                size="small"
+                @change="handleTimeRangeChange"
+              >
+                <el-radio-button value="week">
+                  本周
+                </el-radio-button>
+                <el-radio-button value="month">
+                  本月
+                </el-radio-button>
+                <el-radio-button value="year">
+                  本年
+                </el-radio-button>
               </el-radio-group>
             </div>
           </template>
-          <div class="chart-container" v-if="showCharts">
-            <v-chart class="chart" :option="trendOption" autoresize />
+          <div
+            v-if="showCharts"
+            class="chart-container"
+          >
+            <v-chart
+              class="chart"
+              :option="trendOption"
+              autoresize
+            />
           </div>
-          <div v-else class="no-data">暂无数据</div>
+          <div
+            v-else
+            class="no-data"
+          >
+            暂无数据
+          </div>
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card
+          v-loading="loading"
+          shadow="hover"
+        >
           <template #header>
             <div class="card-header">
               <span>谣言类型分布</span>
             </div>
           </template>
-          <div class="chart-container" v-if="showCharts">
-            <v-chart class="chart" :option="categoryOption" autoresize />
+          <div
+            v-if="showCharts"
+            class="chart-container"
+          >
+            <v-chart
+              class="chart"
+              :option="categoryOption"
+              autoresize
+            />
           </div>
-          <div v-else class="no-data">暂无数据</div>
+          <div
+            v-else
+            class="no-data"
+          >
+            暂无数据
+          </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" class="chart-row">
+    <el-row
+      :gutter="20"
+      class="chart-row"
+    >
       <el-col :span="12">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card
+          v-loading="loading"
+          shadow="hover"
+        >
           <template #header>
             <div class="card-header">
               <span>传播分析</span>
             </div>
           </template>
-          <div class="chart-container" v-if="showCharts">
-            <v-chart class="chart" :option="propagationOption" autoresize />
+          <div
+            v-if="showCharts"
+            class="chart-container"
+          >
+            <v-chart
+              class="chart"
+              :option="propagationOption"
+              autoresize
+            />
           </div>
-          <div v-else class="no-data">暂无数据</div>
+          <div
+            v-else
+            class="no-data"
+          >
+            暂无数据
+          </div>
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card
+          v-loading="loading"
+          shadow="hover"
+        >
           <template #header>
             <div class="card-header">
               <span>谣言类型分布</span>
             </div>
           </template>
-          <div class="chart-container" v-if="showCharts">
-            <v-chart class="chart" :option="categoryOption" autoresize />
+          <div
+            v-if="showCharts"
+            class="chart-container"
+          >
+            <v-chart
+              class="chart"
+              :option="categoryOption"
+              autoresize
+            />
           </div>
-          <div v-else class="no-data">暂无数据</div>
+          <div
+            v-else
+            class="no-data"
+          >
+            暂无数据
+          </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" class="table-row">
+    <el-row
+      :gutter="20"
+      class="table-row"
+    >
       <el-col :span="24">
-        <el-card shadow="hover" v-loading="loading">
+        <el-card
+          v-loading="loading"
+          shadow="hover"
+        >
           <template #header>
             <div class="card-header">
               <span>最近谣言</span>
-              <el-button link @click="viewAllRumors">查看全部</el-button>
+              <el-button
+                link
+                @click="viewAllRumors"
+              >
+                查看全部
+              </el-button>
             </div>
           </template>
-          <el-table :data="rumorStore.rumors" style="width: 100%">
-            <el-table-column prop="id" label="ID" width="80" />
-            <el-table-column prop="content" label="内容" show-overflow-tooltip />
-            <el-table-column prop="source" label="来源" width="120" />
-            <el-table-column prop="status" label="状态" width="100">
+          <el-table
+            :data="rumorStore.rumors"
+            style="width: 100%"
+          >
+            <el-table-column
+              prop="id"
+              label="ID"
+              width="80"
+            />
+            <el-table-column
+              prop="content"
+              label="内容"
+              show-overflow-tooltip
+            />
+            <el-table-column
+              prop="source"
+              label="来源"
+              width="120"
+            />
+            <el-table-column
+              prop="status"
+              label="状态"
+              width="100"
+            >
               <template #default="{ row }">
                 <el-tag :type="getStatusType(row.status)">
                   {{ getStatusText(row.status) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="createTime" label="时间" width="180">
+            <el-table-column
+              prop="createTime"
+              label="时间"
+              width="180"
+            >
               <template #default="{ row }">
                 {{ formatDate(row.createTime) }}
               </template>
