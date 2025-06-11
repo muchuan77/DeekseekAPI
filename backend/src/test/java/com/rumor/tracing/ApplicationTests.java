@@ -1,11 +1,14 @@
 package com.rumor.tracing;
 
+import com.rumor.tracing.config.NoElasticsearchConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Import(NoElasticsearchConfig.class)
 class ApplicationTests {
 
     @Test

@@ -8,6 +8,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.web.client.RestTemplate;
 
 import static org.mockito.Mockito.mock;
 
@@ -44,5 +45,11 @@ public class TestConfig {
     @Primary
     public AuditorAware<String> auditorProvider() {
         return () -> Optional.of("test-user");
+    }
+
+    @Bean
+    @Primary
+    public RestTemplate restTemplate() {
+        return mock(RestTemplate.class);
     }
 } 
