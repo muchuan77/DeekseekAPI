@@ -32,6 +32,17 @@ jobs:
     #     python-version: '3.8'
     #     cache: 'pip'
     
+    - name: Compile Backend
+      run: |
+        cd backend
+        mvn clean compile test-compile
+    
+    - name: Run Backend Coverage
+      run: |
+        cd backend
+        mvn test
+        mvn jacoco:report
+    
     - name: Run SonarQube Scanner
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -41,7 +52,17 @@ jobs:
           -Dsonar.projectKey=muchuan77_DeepseekAPI \
           -Dsonar.organization=muchuan77 \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.java.binaries=target/classes \
+          -Dsonar.java.test.binaries=target/test-classes
+    
+    - name: Upload Backend Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: backend/target/site/jacoco/jacoco.xml
+        flags: backend
+        name: backend-coverage
+        fail_ci_if_error: true
     
     - name: Run ESLint
       run: |
@@ -67,19 +88,6 @@ jobs:
       run: |
         cd backend
         mvn org.owasp:dependency-check-maven:check 
-
-    - name: Run Backend Coverage
-      run: |
-        cd backend
-        mvn test
-        mvn jacoco:report
-    - name: Upload Backend Coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: backend/target/site/jacoco/jacoco.xml
-        flags: backend
-        name: backend-coverage
-        fail_ci_if_error: true
 
     - name: Run Frontend Coverage
       run: |
