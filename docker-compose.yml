@@ -39,16 +39,16 @@ services:
       - rumor-network
 
   # AI服务
-  ai-service:
-    build:
-      context: ./ai-model
-      dockerfile: Dockerfile
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./ai-model:/app
-    networks:
-      - rumor-network
+  # ai-service:
+  #   build:
+  #     context: ./ai-model
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8081:8081"
+  #   volumes:
+  #     - ./ai-model:/app
+  #   networks:
+  #     - rumor-network
 
   # MySQL数据库
   mysql:

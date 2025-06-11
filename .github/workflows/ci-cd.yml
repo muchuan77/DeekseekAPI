@@ -26,11 +26,11 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
-        cache: 'pip'
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.8'
+    #     cache: 'pip'
     
     - name: Build Backend
       run: |
@@ -43,10 +43,10 @@ jobs:
         npm install
         npm run build
     
-    - name: Install Python Dependencies
-      run: |
-        cd ai-model
-        pip install -r requirements.txt
+    # - name: Install Python Dependencies
+    #   run: |
+    #     cd ai-model
+    #     pip install -r requirements.txt
     
     - name: Run Backend Tests
       run: |
@@ -58,10 +58,10 @@ jobs:
         cd frontend
         npm run test
     
-    - name: Run AI Model Tests
-      run: |
-        cd ai-model
-        python -m pytest
+    # - name: Run AI Model Tests
+    #   run: |
+    #     cd ai-model
+    #     python -m pytest
     
     - name: Build Docker Images
       if: github.ref == 'refs/heads/main'
@@ -73,7 +73,7 @@ jobs:
         docker-compose build
         docker tag rumor-tracing-backend $DOCKER_USERNAME/rumor-tracing-backend:latest
         docker tag rumor-tracing-frontend $DOCKER_USERNAME/rumor-tracing-frontend:latest
-        docker tag rumor-tracing-ai $DOCKER_USERNAME/rumor-tracing-ai:latest
+        # docker tag rumor-tracing-ai $DOCKER_USERNAME/rumor-tracing-ai:latest
         docker push $DOCKER_USERNAME/rumor-tracing-backend:latest
         docker push $DOCKER_USERNAME/rumor-tracing-frontend:latest
-        docker push $DOCKER_USERNAME/rumor-tracing-ai:latest 
+        # docker push $DOCKER_USERNAME/rumor-tracing-ai:latest 

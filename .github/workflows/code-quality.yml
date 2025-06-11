@@ -26,11 +26,11 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
-        cache: 'pip'
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.8'
+    #     cache: 'pip'
     
     - name: Run SonarQube Scanner
       env:
@@ -38,8 +38,9 @@ jobs:
       run: |
         cd backend
         mvn sonar:sonar \
-          -Dsonar.projectKey=rumor-tracing \
-          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.projectKey=muchuan77_DeepseekAPI \
+          -Dsonar.organization=muchuan77 \
+          -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
     
     - name: Run ESLint
@@ -48,12 +49,12 @@ jobs:
         npm install
         npm run lint
     
-    - name: Run Python Linting
-      run: |
-        cd ai-model
-        pip install flake8 pylint
-        flake8 .
-        pylint **/*.py
+    # - name: Run Python Linting
+    #   run: |
+    #     cd ai-model
+    #     pip install flake8 pylint
+    #     flake8 .
+    #     pylint **/*.py
     
     - name: Run Security Scan
       uses: snyk/actions/node@master
