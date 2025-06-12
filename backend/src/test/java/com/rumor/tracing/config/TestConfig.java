@@ -4,11 +4,17 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
 import static org.mockito.Mockito.mock;
 
@@ -24,7 +30,7 @@ import java.util.Optional;
 public class TestConfig {
 
     /**
-     * 模拟Redis连接工厂，避免测试时连接真实Redis
+     * 模拟Redis连接工厂
      */
     @Bean
     @Primary
@@ -33,20 +39,61 @@ public class TestConfig {
     }
 
     /**
-     * 模拟RedisTemplate，避免测试时连接真实Redis
+     * 模拟RedisTemplate
      */
     @Bean
     @Primary
     public RedisTemplate<String, Object> redisTemplate() {
-        return mock(RedisTemplate.class);
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
     }
 
+    /**
+     * 模拟StringRedisTemplate
+     */
+    @Bean
+    @Primary
+    public StringRedisTemplate stringRedisTemplate() {
+        StringRedisTemplate template = new StringRedisTemplate();
+        template.setConnectionFactory(redisConnectionFactory());
+        return template;
+    }
+
+    /**
+     * 模拟Elasticsearch操作
+     */
+    @Bean
+    @Primary
+    public ElasticsearchOperations elasticsearchOperations() {
+        return mock(ElasticsearchOperations.class);
+    }
+
+    /**
+     * 模拟ElasticsearchRestTemplate
+     */
+    @Bean
+    @Primary
+    public ElasticsearchRestTemplate elasticsearchRestTemplate() {
+        return mock(ElasticsearchRestTemplate.class);
+    }
+
+    /**
+     * 模拟审计用户提供者
+     */
     @Bean
     @Primary
     public AuditorAware<String> auditorProvider() {
         return () -> Optional.of("test-user");
     }
 
+    /**
+     * 模拟RestTemplate
+     */
     @Bean
     @Primary
     public RestTemplate restTemplate() {

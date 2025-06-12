@@ -18,13 +18,6 @@ spring:
       path: /h2-console
   main:
     allow-bean-definition-overriding: true
-  elasticsearch:
-    rest:
-      uris: http://localhost:9200
-      username: ecat
-      password: yxh258012
-    connection-timeout: 5000
-    socket-timeout: 5000
 
 logging:
   level:
