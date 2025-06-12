@@ -9,10 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
@@ -65,21 +63,12 @@ public class TestConfig {
     }
 
     /**
-     * 模拟Elasticsearch操作
+     * 只mock一个ElasticsearchOperations，避免多primary冲突
      */
     @Bean
     @Primary
     public ElasticsearchOperations elasticsearchOperations() {
         return mock(ElasticsearchOperations.class);
-    }
-
-    /**
-     * 模拟ElasticsearchRestTemplate
-     */
-    @Bean
-    @Primary
-    public ElasticsearchRestTemplate elasticsearchRestTemplate() {
-        return mock(ElasticsearchRestTemplate.class);
     }
 
     /**
