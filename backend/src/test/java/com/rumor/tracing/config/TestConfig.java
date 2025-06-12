@@ -13,8 +13,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
@@ -68,7 +69,21 @@ public class TestConfig {
     @Bean
     @Primary
     public ElasticsearchOperations elasticsearchOperations() {
-        return mock(ElasticsearchOperations.class);
+        ElasticsearchOperations operations = mock(ElasticsearchOperations.class);
+        ElasticsearchConverter converter = mock(ElasticsearchConverter.class);
+        when(operations.getElasticsearchConverter()).thenReturn(converter);
+        return operations;
+    }
+
+    /**
+     * 提供名为elasticsearchTemplate的mock bean，兼容Repository依赖
+     */
+    @Bean(name = "elasticsearchTemplate")
+    public ElasticsearchOperations elasticsearchTemplate() {
+        ElasticsearchOperations operations = mock(ElasticsearchOperations.class);
+        ElasticsearchConverter converter = mock(ElasticsearchConverter.class);
+        when(operations.getElasticsearchConverter()).thenReturn(converter);
+        return operations;
     }
 
     /**

@@ -8,6 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import com.rumor.tracing.repository.LogOperationRepository;
+import com.rumor.tracing.repository.LogAuditRepository;
+import com.rumor.tracing.repository.LogSystemRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -16,6 +18,12 @@ class ApplicationTests {
 
     @MockBean
     private LogOperationRepository logOperationRepository;
+
+    @MockBean
+    private LogAuditRepository logAuditRepository;
+
+    @MockBean
+    private LogSystemRepository logSystemRepository;
 
     @Test
     void contextLoads() {
