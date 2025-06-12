@@ -6,11 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import com.rumor.tracing.repository.LogOperationRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Import({NoElasticsearchConfig.class, TestConfig.class})
 class ApplicationTests {
+
+    @MockBean
+    private LogOperationRepository logOperationRepository;
 
     @Test
     void contextLoads() {
