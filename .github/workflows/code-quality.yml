@@ -52,9 +52,7 @@ jobs:
           -Dsonar.projectKey=muchuan77_DeepseekAPI \
           -Dsonar.organization=muchuan77 \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.java.binaries=target/classes \
-          -Dsonar.java.test.binaries=target/test-classes
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
     
     - name: Upload Backend Coverage to Codecov
       uses: codecov/codecov-action@v3
