@@ -1,10 +1,12 @@
 package com.rumor.tracing.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+@Profile("!test")
 @Configuration
 @EnableElasticsearchRepositories(basePackages = "com.rumor.tracing.repository")
 public class LogElasticsearchConfig extends ElasticsearchConfiguration {
