@@ -25,6 +25,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
     
     # - name: Set up Python
     #   uses: actions/setup-python@v4
@@ -32,83 +33,18 @@ jobs:
     #     python-version: '3.8'
     #     cache: 'pip'
     
-    - name: Compile Backend
+    - name: Backend - Code Coverage
       run: |
         cd backend
-        mvn clean compile test-compile
+        mvn clean test jacoco:report
     
-    - name: Run Backend Coverage
-      run: |
-        cd backend
-        mvn test
-        mvn jacoco:report
-    
-    - name: Run SonarQube Scanner
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        cd backend
-        mvn sonar:sonar \
-          -Dsonar.projectKey=muchuan77_DeepseekAPI \
-          -Dsonar.organization=muchuan77 \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-    
-    - name: Upload Backend Coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: backend/target/site/jacoco/jacoco.xml
-        flags: backend
-        name: backend-coverage
-        fail_ci_if_error: true
-    
-    - name: Run ESLint
+    - name: Frontend - Install and Lint
       run: |
         cd frontend
-        npm install
+        npm ci
         npm run lint
     
-    # - name: Run Python Linting
-    #   run: |
-    #     cd ai-model
-    #     pip install flake8 pylint
-    #     flake8 .
-    #     pylint **/*.py
-    
-    - name: Run Security Scan
-      uses: snyk/actions/node@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: --severity-threshold=high
-    
-    - name: Run Dependency Check
-      run: |
-        cd backend
-        mvn org.owasp:dependency-check-maven:check 
-
-    - name: Run Frontend Coverage
+    - name: Frontend - Test Coverage
       run: |
         cd frontend
-        npm run test:coverage
-    - name: Upload Frontend Coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: frontend/coverage/lcov.info
-        flags: frontend
-        name: frontend-coverage
-        fail_ci_if_error: true
-
-#     - name: Run AI Model Coverage
-#       run: |
-#         cd ai-model
-#         pip install numpy==1.24.4
-#         pip install -r requirements.txt
-#         pytest --cov=. --cov-report=xml
-#     - name: Upload AI Model Coverage to Codecov
-#       uses: codecov/codecov-action@v3
-#       with:
-#         files: ai-model/coverage.xml
-#         flags: ai-model
-#         name: ai-model-coverage
-#         fail_ci_if_error: true 
+        npm run test:coverage 

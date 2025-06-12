@@ -77,4 +77,32 @@ export function getPropagationStatistics(rumorId) {
     url: `/api/propagation/statistics/${rumorId}`,
     method: 'get'
   }).catch(error => handleError(error, '获取传播统计失败'))
+}
+
+// 获取传播数据
+export function getPropagationData(params) {
+  return request({
+    url: '/api/propagation/data',
+    method: 'get',
+    params
+  }).catch(error => handleError(error, '获取传播数据失败'))
+}
+
+// 分析传播
+export function analyzePropagation(params) {
+  return request({
+    url: '/api/propagation/analyze',
+    method: 'post',
+    data: params
+  }).catch(error => handleError(error, '传播分析失败'))
+}
+
+// 导出传播数据
+export function exportPropagationData(params) {
+  return request({
+    url: '/api/propagation/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  }).catch(error => handleError(error, '导出传播数据失败'))
 } 

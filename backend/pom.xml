@@ -33,8 +33,6 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.java.binaries>target/classes</sonar.java.binaries>
         <sonar.java.test.binaries>target/test-classes</sonar.java.test.binaries>
-        <sonar.java.libraries>target/dependency/*.jar</sonar.java.libraries>
-        <sonar.java.test.libraries>target/dependency/*.jar</sonar.java.test.libraries>
         <sonar.sources>src/main/java</sonar.sources>
         <sonar.tests>src/test/java</sonar.tests>
         <sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
