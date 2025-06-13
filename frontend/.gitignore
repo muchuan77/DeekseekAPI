@@ -26,8 +26,3 @@ dist-ssr
 # Testing
 coverage
 .nyc_output
-
-# Environment files
-.env
-.env.*
-!.env.example 

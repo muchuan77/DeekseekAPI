@@ -47,4 +47,4 @@ jobs:
     - name: Frontend - Test Coverage
       run: |
         cd frontend
-        npm run test:coverage 
+        npm run test:coverage

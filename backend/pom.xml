@@ -20,7 +20,7 @@
     <properties>
         <java.version>18</java.version>
         <spring-cloud.version>2021.0.3</spring-cloud.version>
-        <elasticsearch.version>7.17.4</elasticsearch.version>
+        <elasticsearch.version>7.17.9</elasticsearch.version>
         <spring-data-elasticsearch.version>4.4.0</spring-data-elasticsearch.version>
         <jwt.version>0.11.5</jwt.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -87,16 +87,6 @@
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>${elasticsearch.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>${elasticsearch.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
         <dependency>

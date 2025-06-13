@@ -77,7 +77,7 @@ export function getPropagationStatistics(rumorId) {
     url: `/api/propagation/statistics/${rumorId}`,
     method: 'get'
   }).catch(error => handleError(error, '获取传播统计失败'))
-}
+} 
 
 // 获取传播数据
 export function getPropagationData(params) {

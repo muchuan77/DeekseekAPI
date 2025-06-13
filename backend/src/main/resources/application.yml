@@ -23,9 +23,9 @@ spring:
     active: local
 
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:rumor_tracing}?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&logger=Slf4JLogger&profileSQL=true
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:Yxh258012}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/rumor_tracing?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&logger=Slf4JLogger&profileSQL=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:Yxh258012}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -47,9 +47,9 @@ spring:
           time_zone: UTC
 
   redis:
-    host: ${REDIS_HOST:localhost}
+    host: ${SPRING_REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:}
+    password: ${SPRING_REDIS_PASSWORD:redis}
     database: 0
     timeout: 10000
     lettuce:
@@ -61,11 +61,22 @@ spring:
 
   elasticsearch:
     rest:
-      uris: http://localhost:9200
-      username: ecat
-      password: yxh258012
-    connection-timeout: 5000
-    socket-timeout: 5000
+      uris: http://${ELASTIC_HOST:localhost}:${ELASTIC_PORT:9200}
+      username: ${ELASTIC_USERNAME:ecat}
+      password: ${ELASTIC_PASSWORD:yxh258012}
+    connection-timeout: 10000
+    socket-timeout: 10000
+    connection-request-timeout: 10000
+    max-conn-total: 100
+    max-conn-per-route: 100
+    properties:
+      path.home: /usr/share/elasticsearch
+      path.data: /usr/share/elasticsearch/data
+      path.logs: /usr/share/elasticsearch/logs
+      http.cors.enabled: true
+      http.cors.allow-origin: "*"
+      http.cors.allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
+      http.cors.allow-headers: X-Requested-With, X-Auth-Token, Content-Type, Content-Length, Authorization
 
   mvc:
     pathmatch:
@@ -75,20 +86,23 @@ logging:
   level:
     root: INFO
     com.rumor.tracing: DEBUG
-    org.springframework.web: DEBUG
-    org.springdoc: DEBUG
+    org.springframework.web: INFO
+    org.springdoc: INFO
     org.springframework.security: INFO
-    org.hibernate: DEBUG
-    com.zaxxer.hikari: DEBUG
-    org.springframework.jdbc: DEBUG
+    org.hibernate: INFO
+    com.zaxxer.hikari: INFO
+    org.springframework.jdbc: INFO
+    org.elasticsearch: INFO
+    org.springframework.data.elasticsearch: DEBUG
+    org.elasticsearch.client: DEBUG
   file:
     name: logs/application.log
 
 ai:
   service:
-    url: https://api.deepseek.com
-    api-key: ${DEEPSEEK_API_KEY:sk-c8c70eeb1e2243bf86eaa3e279549074}
-    timeout: 60000
+    url: ${AI_SERVICE_URL:https://api.deepseek.com}
+    api-key: ${AI_SERVICE_API_KEY:sk-c8c70eeb1e2243bf86eaa3e279549074}
+    timeout: ${AI_SERVICE_TIMEOUT:60000}
     max-retries: 3
     retry-delay: 1000
     model: deepseek-chat
@@ -101,6 +115,26 @@ ai:
 jwt:
   secret: ${JWT_SECRET:J8#kL9$mN2@pQ5*rT7&vX3!wY4^zB6}
   expiration: ${JWT_EXPIRATION:86400}
+
+# DeepSeek API配置
+deepseek:
+  api:
+    url: ${DEEPSEEK_API_URL:https://api.deepseek.com}
+    key: ${DEEPSEEK_API_KEY:sk-c8c70eeb1e2243bf86eaa3e279549074}
+
+# 管理端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
 # OpenAPI
 springdoc:
@@ -118,13 +152,4 @@ springdoc:
     - group: 'default'
       paths-to-match: '/api/**'
       packages-to-scan: com.rumor.tracing.controller
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: always
 
